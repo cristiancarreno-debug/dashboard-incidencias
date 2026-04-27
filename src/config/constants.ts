@@ -1,7 +1,7 @@
 import type { IssueType } from '@/features/rice/rice.types'
 
 /** Base URL del Cloudflare Worker Proxy hacia Jira. */
-export const PROXY_BASE_URL: string = ''
+export const PROXY_BASE_URL: string = 'https://delicate-morning-e673jira-proxy.cristian-carreno.workers.dev'
 
 /**
  * Templates JQL para consultas de incidencias.
