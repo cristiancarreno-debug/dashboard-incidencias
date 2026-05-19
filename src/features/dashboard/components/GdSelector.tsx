@@ -1,35 +1,17 @@
-import { useState } from 'react'
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { ChevronsUpDown, Loader2 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import {
-  Command,
-  CommandInput,
-  CommandEmpty,
-  CommandList,
-  CommandGroup,
-  CommandItem,
-} from '@/components/ui/command'
 import type { JiraProject } from '@/features/jira/types/jira.types'
 
-/** Props del selector multi-GD. */
 export interface GdSelectorProps {
-  /** Lista de proyectos disponibles. */
   projects: JiraProject[]
-  /** Claves de proyecto actualmente seleccionadas. */
   selected: string[]
-  /** Callback cuando cambia la selección. */
   onSelectionChange: (keys: string[]) => void
-  /** Estado de carga mientras se obtienen proyectos. */
   isLoading: boolean
 }
 
 /**
- * Selector multi-GD con búsqueda.
- *
- * Permite al PO seleccionar uno o más Grupos de Desarrollo (GDs)
- * para visualizar sus incidencias en el dashboard. Incluye filtro
- * de texto case-insensitive por nombre o clave de proyecto.
+ * Selector multi-GD con búsqueda — implementación nativa sin Radix UI.
  */
 export function GdSelector({
   projects,
@@ -39,6 +21,15 @@ export function GdSelector({
 }: GdSelectorProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
 
   const filteredProjects = projects.filter((project) => {
     if (!search) return true
@@ -49,7 +40,6 @@ export function GdSelector({
     )
   })
 
-  /** Alterna la selección de un proyecto individual. */
   function toggleProject(key: string) {
     const next = selected.includes(key)
       ? selected.filter((k) => k !== key)
@@ -57,77 +47,70 @@ export function GdSelector({
     onSelectionChange(next)
   }
 
-  /** Texto del botón trigger según la cantidad de GDs seleccionados. */
   function getTriggerLabel(): string {
     if (selected.length === 0) return 'Seleccionar GDs...'
-    if (selected.length === 1) return `1 GD seleccionado`
+    if (selected.length === 1) return '1 GD seleccionado'
     return `${selected.length} GDs seleccionados`
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <button
-          role="combobox"
-          aria-expanded={open}
-          aria-label="Seleccionar Grupos de Desarrollo"
-          className={cn(
-            'flex h-10 w-[280px] items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm',
-            'hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
-            'disabled:cursor-not-allowed disabled:opacity-50'
-          )}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <span className="flex items-center gap-2 text-gray-500">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Cargando proyectos...
-            </span>
-          ) : (
-            <span className="truncate">{getTriggerLabel()}</span>
-          )}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </button>
-      </PopoverTrigger>
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        disabled={isLoading}
+        className={cn(
+          'flex h-10 w-[280px] items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm',
+          'hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+          'disabled:cursor-not-allowed disabled:opacity-50'
+        )}
+      >
+        {isLoading ? (
+          <span className="flex items-center gap-2 text-gray-500">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Cargando proyectos...
+          </span>
+        ) : (
+          <span className="truncate">{getTriggerLabel()}</span>
+        )}
+        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+      </button>
 
-      <PopoverContent className="w-[280px] p-0" align="start">
-        <Command>
-          <CommandInput
-            placeholder="Buscar GD..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <CommandList>
+      {open && (
+        <div className="absolute top-full left-0 z-50 mt-1 w-[280px] rounded-md border border-gray-200 bg-white shadow-lg">
+          <div className="flex items-center border-b px-3">
+            <input
+              className="flex h-9 w-full bg-transparent py-2 text-sm outline-none placeholder:text-gray-400"
+              placeholder="Buscar GD..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="max-h-[300px] overflow-y-auto p-1">
             {filteredProjects.length === 0 ? (
-              <CommandEmpty>No se encontraron GDs.</CommandEmpty>
+              <p className="py-6 text-center text-sm text-gray-500">No se encontraron GDs.</p>
             ) : (
-              <CommandGroup>
-                {filteredProjects.map((project) => {
-                  const isSelected = selected.includes(project.key)
-                  return (
-                    <CommandItem
-                      key={project.key}
-                      onClick={() => toggleProject(project.key)}
-                      aria-selected={isSelected}
-                    >
-                      <Check
-                        className={cn(
-                          'mr-2 h-4 w-4',
-                          isSelected ? 'opacity-100' : 'opacity-0'
-                        )}
-                      />
-                      <span className="font-medium">{project.key}</span>
-                      <span className="ml-2 truncate text-gray-500">
-                        {project.name}
-                      </span>
-                    </CommandItem>
-                  )
-                })}
-              </CommandGroup>
+              filteredProjects.map((project) => {
+                const isSelected = selected.includes(project.key)
+                return (
+                  <label
+                    key={project.key}
+                    className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm hover:bg-gray-100"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleProject(project.key)}
+                      className="mr-2 h-4 w-4 rounded border-gray-300 accent-[hsl(153,100%,32.5%)]"
+                    />
+                    <span className="font-medium">{project.key}</span>
+                    <span className="ml-2 truncate text-gray-500">{project.name}</span>
+                  </label>
+                )
+              })
             )}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
