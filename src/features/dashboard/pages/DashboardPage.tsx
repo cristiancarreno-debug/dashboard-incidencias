@@ -80,7 +80,6 @@ export function DashboardPage() {
   const { selectedKeys, selectAll, clearSelection } = useBulkActions()
 
   // --- Estado local ---
-  const [pageLoadTime] = useState(() => new Date().toLocaleString("es-CO"))
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedInitiatives, setSelectedInitiatives] = useState<string[]>([])
   const [ricePopover, setRicePopover] = useState<{
@@ -182,7 +181,7 @@ export function DashboardPage() {
         />
         <div className="ml-auto text-right">
             <p className="text-xs text-gray-400">Última actualización</p>
-            <p className="text-sm font-medium text-gray-600">{dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleString("es-CO") : pageLoadTime}</p>
+            <p className="text-sm font-medium text-gray-600">{dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleString("es-CO") : "Sin consultar aún"}</p>
             <p className="text-xs text-gray-400 mt-0.5">Datos en tiempo real desde Jira</p>
           </div>
         <RefreshButton
