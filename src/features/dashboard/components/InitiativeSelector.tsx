@@ -15,9 +15,6 @@ interface Initiative {
   gd: string
 }
 
-/**
- * Selector de iniciativas (épicas) agrupadas por GD — implementación nativa.
- */
 export function InitiativeSelector({
   issues,
   selectedGds,
@@ -39,18 +36,14 @@ export function InitiativeSelector({
   const initiativesByGd = useMemo(() => {
     const map = new Map<string, Initiative[]>()
     const seen = new Set<string>()
-
     for (const issue of issues) {
       if (selectedGds.length > 0 && !selectedGds.includes(issue.project)) continue
       if (issue.epic === 'Sin épica') continue
-
       const uniqueKey = `${issue.project}::${issue.epic}`
       if (seen.has(uniqueKey)) continue
       seen.add(uniqueKey)
-
-      const initiative: Initiative = { key: issue.epic, gd: issue.project }
       const list = map.get(issue.project) ?? []
-      list.push(initiative)
+      list.push({ key: issue.epic, gd: issue.project })
       map.set(issue.project, list)
     }
     return map
@@ -77,8 +70,8 @@ export function InitiativeSelector({
 
   function getTriggerLabel(): string {
     if (selectedInitiatives.length === 0) return 'Seleccionar iniciativas...'
-    if (selectedInitiatives.length === 1) return '1 iniciativa seleccionada'
-    return `${selectedInitiatives.length} iniciativas seleccionadas`
+    if (selectedInitiatives.length === 1) return '1 iniciativa'
+    return `${selectedInitiatives.length} iniciativas`
   }
 
   return (
@@ -110,22 +103,23 @@ export function InitiativeSelector({
             ) : (
               Array.from(filteredByGd.entries()).map(([gd, initiatives]) => (
                 <div key={gd}>
-                  <div className="px-2 py-1.5 text-xs font-semibold text-gray-500">{gd}</div>
+                  <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase">{gd}</div>
                   {initiatives.map((initiative) => {
                     const isSelected = selectedInitiatives.includes(initiative.key)
                     return (
-                      <label
+                      <div
                         key={`${gd}-${initiative.key}`}
-                        className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm hover:bg-gray-100"
+                        className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-gray-100"
+                        onClick={() => toggleInitiative(initiative.key)}
                       >
                         <input
                           type="checkbox"
                           checked={isSelected}
-                          onChange={() => toggleInitiative(initiative.key)}
-                          className="mr-2 h-4 w-4 rounded border-gray-300 accent-[hsl(153,100%,32.5%)]"
+                          readOnly
+                          className="h-4 w-4 rounded border-gray-300 accent-[hsl(153,100%,32.5%)] pointer-events-none"
                         />
                         <span className="truncate">{initiative.key}</span>
-                      </label>
+                      </div>
                     )
                   })}
                 </div>

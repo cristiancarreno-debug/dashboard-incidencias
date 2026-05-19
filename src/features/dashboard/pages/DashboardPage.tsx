@@ -178,6 +178,11 @@ export function DashboardPage() {
           selectedInitiatives={selectedInitiatives}
           onSelectionChange={setSelectedInitiatives}
         />
+        <div className="ml-auto text-right">
+            <p className="text-xs text-gray-400">Última actualización</p>
+            <p className="text-sm font-medium text-gray-600">{new Date().toLocaleString("es-CO")}</p>
+            <p className="text-xs text-gray-400 mt-0.5">Datos en tiempo real desde Jira</p>
+          </div>
         <RefreshButton
           onRefresh={onRefresh}
           isRefreshing={isFetching}
