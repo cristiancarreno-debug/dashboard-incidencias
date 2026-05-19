@@ -215,12 +215,10 @@ export function DashboardPage() {
       {/* Dashboard content */}
       {selectedGds.length > 0 && !isLoadingIssues && (
         <>
+          {/* Resumen */}
+          <MetricsRow datasetCompleto={datasetCompleto} datasetActivo={datasetActivo} selectedGds={selectedGds} />
 
-
-          {/* RICE KPI Cards */}
-
-
-          {/* Person Cards */}
+          {/* Asignaciones */}
           <PersonCards issues={filteredByInitiatives} />
 
 

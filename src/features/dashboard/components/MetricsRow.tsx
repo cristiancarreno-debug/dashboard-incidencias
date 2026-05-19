@@ -25,58 +25,63 @@ const RICE_CONFIG = [
 ] as const
 
 /**
- * Fila única con Resumen + Tipología + RICE en una línea horizontal.
+ * Sección Resumen con 4 grupos de cards en una fila:
+ * Total | Abiertos | Tipología | RICE
  */
 export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Props) {
   const kpis = computeKpis(datasetActivo)
 
   return (
-    <div className="flex items-end gap-4 overflow-x-auto pb-1">
-      {/* RESUMEN */}
-      <div className="shrink-0">
-        <p className="text-[10px] font-semibold text-gray-500 uppercase mb-1">Resumen <span className="normal-case font-normal">({selectedGds.join(', ')})</span></p>
-        <div className="flex gap-2">
-          <div className="flex items-center gap-2 rounded-lg border bg-white px-3 py-2 shadow-sm">
-            <LayoutDashboard className="h-4 w-4 text-gray-600" />
-            <div><p className="text-lg font-bold">{datasetCompleto.length}</p><p className="text-[9px] text-gray-500">Total</p></div>
+    <div className="space-y-3">
+      <h3 className="text-sm font-semibold text-gray-700">
+        Resumen <span className="font-normal text-gray-500">({selectedGds.join(', ')})</span>
+      </h3>
+      <div className="flex items-end gap-4 overflow-x-auto pb-1">
+        {/* Total incidentes */}
+        <div className="flex items-center gap-2 rounded-lg border bg-white px-4 py-3 shadow-sm shrink-0">
+          <LayoutDashboard className="h-5 w-5 text-gray-600" />
+          <div>
+            <p className="text-2xl font-bold">{datasetCompleto.length}</p>
+            <p className="text-[10px] text-gray-500">Total incidentes</p>
           </div>
-          <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 shadow-sm">
-            <FolderKanban className="h-4 w-4 text-amber-600" />
-            <div><p className="text-lg font-bold text-amber-900">{datasetActivo.length}</p><p className="text-[9px] text-amber-600">Activas</p></div>
+        </div>
+
+        {/* Incidentes abiertos */}
+        <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 shadow-sm shrink-0">
+          <FolderKanban className="h-5 w-5 text-amber-600" />
+          <div>
+            <p className="text-2xl font-bold text-amber-900">{datasetActivo.length}</p>
+            <p className="text-[10px] text-amber-600">Abiertos</p>
           </div>
         </div>
-      </div>
 
-      {/* SEPARADOR */}
-      <div className="w-px h-12 bg-gray-200 shrink-0" />
+        {/* Separador */}
+        <div className="w-px h-12 bg-gray-200 shrink-0" />
 
-      {/* TIPOLOGÍA */}
-      <div className="shrink-0">
-        <p className="text-[10px] font-semibold text-gray-500 uppercase mb-1">Tipología</p>
-        <div className="flex gap-2">
-          {Object.entries(kpis.byType).map(([tipo, count]) => (
-            <div key={tipo} className="flex items-center gap-1.5 rounded-lg border bg-white px-2.5 py-2 shadow-sm">
-              {TYPE_ICONS[tipo] ?? <ClipboardList className="h-4 w-4 text-gray-400" />}
-              <div><p className="text-lg font-bold">{count}</p><p className="text-[9px] text-gray-500">{tipo}</p></div>
+        {/* Tipología */}
+        {Object.entries(kpis.byType).map(([tipo, count]) => (
+          <div key={tipo} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm shrink-0">
+            {TYPE_ICONS[tipo] ?? <ClipboardList className="h-4 w-4 text-gray-400" />}
+            <div>
+              <p className="text-2xl font-bold">{count}</p>
+              <p className="text-[10px] text-gray-500">{tipo}</p>
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        ))}
 
-      {/* SEPARADOR */}
-      <div className="w-px h-12 bg-gray-200 shrink-0" />
+        {/* Separador */}
+        <div className="w-px h-12 bg-gray-200 shrink-0" />
 
-      {/* RICE */}
-      <div className="shrink-0">
-        <p className="text-[10px] font-semibold text-gray-500 uppercase mb-1">Matriz RICE</p>
-        <div className="flex gap-2">
-          {RICE_CONFIG.map(({ key, color, icon }) => (
-            <div key={key} className="flex items-center gap-1.5 rounded-lg border bg-white px-2.5 py-2 shadow-sm" style={{ borderLeftWidth: '3px', borderLeftColor: color }}>
-              {icon}
-              <div><p className="text-lg font-bold">{kpis.byRicePriority[key] ?? 0}</p><p className="text-[9px] text-gray-500">{key}</p></div>
+        {/* RICE */}
+        {RICE_CONFIG.map(({ key, color, icon }) => (
+          <div key={key} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm shrink-0" style={{ borderLeftWidth: '3px', borderLeftColor: color }}>
+            {icon}
+            <div>
+              <p className="text-2xl font-bold">{kpis.byRicePriority[key] ?? 0}</p>
+              <p className="text-[10px] text-gray-500">{key}</p>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   )
