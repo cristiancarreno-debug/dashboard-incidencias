@@ -163,7 +163,7 @@ export function DashboardPage() {
   }, [selectedGds])
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6">
+    <div className="w-full space-y-6 px-6 py-6">
       {/* Header: Selectores + Refresh */}
       <header className="flex flex-wrap items-center gap-3">
         <GdSelector
@@ -195,7 +195,7 @@ export function DashboardPage() {
       {/* Loading state */}
       {isLoadingIssues && selectedGds.length > 0 && (
         <div className="flex items-center justify-center py-12">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           <span className="ml-3 text-sm text-gray-500">
             Cargando incidencias...
           </span>

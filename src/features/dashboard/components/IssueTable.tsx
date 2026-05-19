@@ -28,6 +28,19 @@ export interface IssueTableProps {
 }
 
 /** Colores de badge según prioridad RICE. */
+/** Colores de badge según estado. */
+function getStatusColor(status: string): string {
+  const colors: Record<string, string> = {
+    Backlog: "bg-gray-700 text-white",
+    "Por Hacer": "bg-gray-200 text-gray-700",
+    "En Progreso": "bg-yellow-300 text-yellow-900",
+    "En Pruebas QA": "bg-blue-200 text-blue-800",
+    "En Pruebas UAT": "bg-green-200 text-green-800",
+    "Pendiente PAP": "bg-green-700 text-white",
+    Bloqueado: "bg-red-600 text-white",
+  }
+  return colors[status] ?? "bg-gray-100 text-gray-700"
+}
 const RICE_PRIORITY_COLORS: Record<string, string> = {
   Crítica: 'bg-red-100 text-red-800',
   Alta: 'bg-orange-100 text-orange-800',
@@ -117,7 +130,7 @@ export function IssueTable({
         </span>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-full">
         <table className="w-full text-left text-sm">
           <thead className="border-b bg-gray-50 text-xs uppercase text-gray-600">
             <tr>
@@ -177,7 +190,7 @@ export function IssueTable({
                 </td>
                 <td className="whitespace-nowrap px-3 py-2">{issue.tipo}</td>
                 <td className="whitespace-nowrap px-3 py-2">
-                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium">
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getStatusColor(issue.status)}`}>
                     {issue.status}
                   </span>
                 </td>
