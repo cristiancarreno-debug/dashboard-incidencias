@@ -36,9 +36,9 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
       <h3 className="text-sm font-semibold text-gray-700">
         Resumen <span className="font-normal text-gray-500">({selectedGds.join(', ')})</span>
       </h3>
-      <div className="flex items-end gap-4 overflow-x-auto pb-1">
+      <div className="flex items-end gap-4 w-full justify-between">
         {/* Total incidentes */}
-        <div className="flex items-center gap-2 rounded-lg border bg-white px-4 py-3 shadow-sm shrink-0">
+        <div className="flex items-center gap-2 rounded-lg border bg-white px-4 py-3 shadow-sm flex-1">
           <LayoutDashboard className="h-5 w-5 text-gray-600" />
           <div>
             <p className="text-2xl font-bold">{datasetCompleto.length}</p>
@@ -47,7 +47,7 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
         </div>
 
         {/* Incidentes abiertos */}
-        <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 shadow-sm shrink-0">
+        <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 shadow-sm flex-1">
           <FolderKanban className="h-5 w-5 text-amber-600" />
           <div>
             <p className="text-2xl font-bold text-amber-900">{datasetActivo.length}</p>
@@ -60,7 +60,7 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
 
         {/* Tipología */}
         {Object.entries(kpis.byType).map(([tipo, count]) => (
-          <div key={tipo} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm shrink-0">
+          <div key={tipo} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm flex-1">
             {TYPE_ICONS[tipo] ?? <ClipboardList className="h-4 w-4 text-gray-400" />}
             <div>
               <p className="text-2xl font-bold">{count}</p>
@@ -74,7 +74,7 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
 
         {/* RICE */}
         {RICE_CONFIG.map(({ key, color, icon }) => (
-          <div key={key} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm shrink-0" style={{ borderLeftWidth: '3px', borderLeftColor: color }}>
+          <div key={key} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm flex-1" style={{ borderLeftWidth: '3px', borderLeftColor: color }}>
             {icon}
             <div>
               <p className="text-2xl font-bold">{kpis.byRicePriority[key] ?? 0}</p>
