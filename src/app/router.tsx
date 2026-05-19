@@ -1,23 +1,14 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
 import { EquipoPage } from '@/features/equipo/EquipoPage'
 
-const basename = import.meta.env.BASE_URL || '/'
-
-const router = createBrowserRouter(
-  [
-    {
-      path: '/',
-      element: <DashboardPage />,
-    },
-    {
-      path: '/equipo',
-      element: <EquipoPage />,
-    },
-  ],
-  { basename }
-)
-
 export function AppRouter() {
-  return <RouterProvider router={router} />
+  return (
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/equipo" element={<EquipoPage />} />
+      </Routes>
+    </HashRouter>
+  )
 }
