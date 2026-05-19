@@ -155,7 +155,6 @@ export function IssueTable({
                   </span>
                 </th>
               ))}
-              <th className="px-3 py-3">Épica</th>
               <th className="px-3 py-3">Acciones</th>
             </tr>
           </thead>
@@ -206,10 +205,7 @@ export function IssueTable({
                   </button>
                 </td>
                 <td className="whitespace-nowrap px-3 py-2 text-gray-600">
-                  {issue.createdFormatted}
-                </td>
-                <td className="max-w-[200px] truncate px-3 py-2 text-xs text-gray-500" title={issue.epic}>
-                  {issue.epic}
+                  {issue.created.slice(0, 10)}
                 </td>
                 <td className="px-3 py-2">
                   <button
