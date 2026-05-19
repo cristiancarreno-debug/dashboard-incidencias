@@ -165,11 +165,7 @@ export function DashboardPage() {
           onSelectionChange={setSelectedGds}
           isLoading={isLoadingProjects}
         />
-        <div className="ml-auto text-right">
-            <p className="text-xs text-gray-400">Última actualización</p>
-            <p className="text-sm font-medium text-gray-600">{lastUpdateRef.current > 0 ? new Date(lastUpdateRef.current).toLocaleString("es-CO") : "Sin consultar aún"}</p>
-            <p className="text-xs text-gray-400 mt-0.5">Datos en tiempo real desde Jira</p>
-          </div>
+        
         {selectedGds.length > 0 && !isLoadingIssues && (
           <FilterBar
             issues={filteredByInitiatives}
