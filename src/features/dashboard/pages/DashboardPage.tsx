@@ -17,7 +17,7 @@
  * Valida: Requisitos 1.1, 1.2, 3.4, 7.1, 7.3, 11.3, 11.4, 11.5, 11.6
  */
 
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { useProjects } from '@/features/jira/hooks/useProjects'
@@ -80,6 +80,8 @@ export function DashboardPage() {
   const { selectedKeys, selectAll, clearSelection } = useBulkActions()
 
   // --- Estado local ---
+  const lastUpdateRef = useRef<number>(0)
+  if (dataUpdatedAt const [searchQuery, setSearchQuery] = useStateconst [searchQuery, setSearchQuery] = useState dataUpdatedAt > 0) lastUpdateRef.current = dataUpdatedAt
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedInitiatives, setSelectedInitiatives] = useState<string[]>([])
   const [ricePopover, setRicePopover] = useState<{
@@ -181,7 +183,7 @@ export function DashboardPage() {
         />
         <div className="ml-auto text-right">
             <p className="text-xs text-gray-400">Última actualización</p>
-            <p className="text-sm font-medium text-gray-600">{dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleString("es-CO") : "Sin consultar aún"}</p>
+            <p className="text-sm font-medium text-gray-600">{lastUpdateRef.current > 0 ? new Date(lastUpdateRef.current).toLocaleString("es-CO") : "Sin consultar aún"}</p>
             <p className="text-xs text-gray-400 mt-0.5">Datos en tiempo real desde Jira</p>
           </div>
         <RefreshButton
