@@ -20,9 +20,9 @@ export function KpiCards({ datasetActivo }: KpiCardsProps) {
   const kpisActivo = computeKpis(datasetActivo)
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 min-w-0">
       <h3 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-2">Clasificación por Tipología</h3>
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2">
         {Object.entries(kpisActivo.byType).map(([tipo, count]) => (
           <div key={tipo} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-2 shadow-sm">
             {TYPE_ICONS[tipo] ?? <ClipboardList className="h-4 w-4 text-gray-400" />}

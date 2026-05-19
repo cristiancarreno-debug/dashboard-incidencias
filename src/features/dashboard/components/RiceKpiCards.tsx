@@ -19,7 +19,7 @@ export function RiceKpiCards({ datasetActivo }: RiceKpiCardsProps) {
   const { byRicePriority } = computeKpis(datasetActivo)
 
   return (
-    <div className="shrink-0">
+    <div className="shrink-0 min-w-0">
       <h3 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-2">Clasificación Matriz RICE</h3>
       <div className="flex gap-2">
         {PRIORITY_ORDER.map((priority) => {
