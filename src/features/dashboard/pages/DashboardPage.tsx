@@ -37,7 +37,6 @@ import {
 import { riceAnalyze } from '@/features/rice/rice-engine'
 
 import { GdSelector } from '../components/GdSelector'
-import { InitiativeSelector } from '../components/InitiativeSelector'
 import { RefreshButton } from '../components/RefreshButton'
 import { SummaryHeader } from '../components/SummaryHeader'
 import { KpiCards } from '../components/KpiCards'
@@ -83,7 +82,6 @@ export function DashboardPage() {
   const lastUpdateRef = useRef<number>(0)
   if (dataUpdatedAt && dataUpdatedAt > 0) lastUpdateRef.current = dataUpdatedAt
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedInitiatives, setSelectedInitiatives] = useState<string[]>([])
   const [ricePopover, setRicePopover] = useState<{
     issue: EnrichedIssue
     anchor: HTMLElement
@@ -104,11 +102,7 @@ export function DashboardPage() {
   )
 
   // --- Filtrado, búsqueda y ordenamiento (memoizado) ---
-  const filteredByInitiatives = useMemo(() => {
-    if (selectedInitiatives.length === 0) return datasetActivo
-    const keySet = new Set(selectedInitiatives)
-    return datasetActivo.filter((issue) => keySet.has(issue.epic))
-  }, [datasetActivo, selectedInitiatives])
+  const filteredByInitiatives = datasetActivo
 
   const filteredIssues = useMemo(
     () => applyFilters(filteredByInitiatives, filters),
@@ -160,10 +154,6 @@ export function DashboardPage() {
     }
   }, [invalidGdsDiscarded])
 
-  // --- Limpiar iniciativas cuando cambian los GDs ---
-  useEffect(() => {
-    setSelectedInitiatives([])
-  }, [selectedGds])
 
   return (
     <div className="w-full space-y-6 px-6 py-6">
@@ -175,21 +165,30 @@ export function DashboardPage() {
           onSelectionChange={setSelectedGds}
           isLoading={isLoadingProjects}
         />
-        <InitiativeSelector
-          issues={enrichedIssues}
-          selectedGds={selectedGds}
-          selectedInitiatives={selectedInitiatives}
-          onSelectionChange={setSelectedInitiatives}
-        />
         <div className="ml-auto text-right">
             <p className="text-xs text-gray-400">Última actualización</p>
             <p className="text-sm font-medium text-gray-600">{lastUpdateRef.current > 0 ? new Date(lastUpdateRef.current).toLocaleString("es-CO") : "Sin consultar aún"}</p>
             <p className="text-xs text-gray-400 mt-0.5">Datos en tiempo real desde Jira</p>
           </div>
-        <RefreshButton
-          onRefresh={onRefresh}
-          isRefreshing={isFetching}
-        />
+        {selectedGds.length > 0 && !isLoadingIssues && (
+          <FilterBar
+            issues={filteredByInitiatives}
+            filters={filters}
+            onFiltersChange={setFilters}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+          />
+        )}
+        <div className="ml-auto flex items-center gap-3">
+          <div className="text-right">
+            <p className="text-xs text-gray-400">Última actualización</p>
+            <p className="text-sm font-medium text-gray-600">{lastUpdateRef.current > 0 ? new Date(lastUpdateRef.current).toLocaleString("es-CO") : "Sin consultar aún"}</p>
+          </div>
+          <RefreshButton
+            onRefresh={onRefresh}
+            isRefreshing={isFetching}
+          />
+        </div>
       </header>
 
       {/* Alerta de GDs inválidos descartados */}
@@ -242,14 +241,7 @@ export function DashboardPage() {
           {/* Person Cards */}
           <PersonCards issues={filteredByInitiatives} />
 
-          {/* Filter Bar + Search */}
-          <FilterBar
-            issues={filteredByInitiatives}
-            filters={filters}
-            onFiltersChange={setFilters}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-          />
+
 
           {/* Issue Table */}
           <IssueTable
