@@ -223,7 +223,7 @@ export function DashboardPage() {
       {selectedGds.length > 0 && !isLoadingIssues && (
         <>
           {/* Summary Header */}
-          <div className="flex flex-wrap gap-4 items-start">
+          
           <SummaryHeader
             datasetCompleto={datasetCompleto}
             datasetActivo={datasetActivo}
@@ -238,7 +238,6 @@ export function DashboardPage() {
 
           {/* RICE KPI Cards */}
           <RiceKpiCards datasetActivo={datasetActivo} />
-          </div>
 
           {/* Person Cards */}
           <PersonCards issues={filteredByInitiatives} />
