@@ -81,8 +81,7 @@ export function DashboardPage() {
 
   // --- Estado local ---
   const lastUpdateRef = useRef<number>(0)
-  if (dataUpdatedAt const [searchQuery, setSearchQuery] = useStateconst [searchQuery, setSearchQuery] = useState dataUpdatedAt > 0) lastUpdateRef.current = dataUpdatedAt
-  const [searchQuery, setSearchQuery] = useState('')
+  if (dataUpdatedAt && dataUpdatedAt > 0) lastUpdateRef.current = dataUpdatedAt
   const [selectedInitiatives, setSelectedInitiatives] = useState<string[]>([])
   const [ricePopover, setRicePopover] = useState<{
     issue: EnrichedIssue
