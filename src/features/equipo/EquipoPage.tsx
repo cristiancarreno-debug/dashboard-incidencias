@@ -4,29 +4,20 @@ import { useIssues } from '@/features/jira/hooks/useIssues'
 import { enrichIssue } from '@/features/dashboard/utils/metrics'
 import { riceAnalyze } from '@/features/rice/rice-engine'
 import { GdSelector } from '@/features/dashboard/components/GdSelector'
-import { EquipoFilters } from './components/EquipoFilters'
 import { PersonDetailCard } from './components/PersonDetailCard'
+import { TERMINAL_STATES } from '@/config/constants'
+import { X } from 'lucide-react'
 import type { EnrichedIssue } from '@/features/rice/rice.types'
 
-interface EquipoFiltersState {
-  profesional: string
-  mesDesde: string
-  mesHasta: string
-}
-
-/**
- * Página de resumen de asignaciones y dedicaciones por integrante del equipo.
- */
 export function EquipoPage() {
   const { data: projects = [], isLoading: isLoadingProjects } = useProjects()
   const projectKeys = useMemo(() => projects.map((p) => p.key), [projects])
 
   const [selectedGds, setSelectedGds] = useState<string[]>([])
-  const [filters, setFilters] = useState<EquipoFiltersState>({
-    profesional: '',
-    mesDesde: '',
-    mesHasta: '',
-  })
+  const [profesional, setProfesional] = useState('')
+  const [fechaDesde, setFechaDesde] = useState('')
+  const [fechaHasta, setFechaHasta] = useState('')
+  const [expandedPerson, setExpandedPerson] = useState<string | null>(null)
 
   const { data: rawIssues = [], isLoading: isLoadingIssues, dataUpdatedAt } = useIssues(selectedGds)
 
@@ -35,57 +26,93 @@ export function EquipoPage() {
     [rawIssues]
   )
 
-  // Filtrar por fecha
   const filteredByDate = useMemo(() => {
     return enrichedIssues.filter((issue) => {
-      const created = issue.created.slice(0, 7) // YYYY-MM
-      if (filters.mesDesde && created < filters.mesDesde) return false
-      if (filters.mesHasta && created > filters.mesHasta) return false
+      const created = issue.created.slice(0, 10)
+      if (fechaDesde && created < fechaDesde) return false
+      if (fechaHasta && created > fechaHasta) return false
       return true
     })
-  }, [enrichedIssues, filters.mesDesde, filters.mesHasta])
+  }, [enrichedIssues, fechaDesde, fechaHasta])
 
-  // Agrupar por persona
   const personData = useMemo(() => {
     const map = new Map<string, EnrichedIssue[]>()
     for (const issue of filteredByDate) {
       const name = issue.assignee || 'Sin asignar'
-      if (filters.profesional && !name.toLowerCase().includes(filters.profesional.toLowerCase())) continue
+      if (profesional && !name.toLowerCase().includes(profesional.toLowerCase())) continue
       const list = map.get(name) ?? []
       list.push(issue)
       map.set(name, list)
     }
-    // Ordenar por cantidad de asignaciones (mayor primero)
     return Array.from(map.entries())
       .map(([name, issues]) => ({ name, issues }))
       .sort((a, b) => b.issues.length - a.issues.length)
-  }, [filteredByDate, filters.profesional])
+  }, [filteredByDate, profesional])
+
+  const hasFilters = profesional || fechaDesde || fechaHasta
+  const clearFilters = () => { setProfesional(''); setFechaDesde(''); setFechaHasta('') }
 
   return (
     <div className="w-full space-y-6 px-6 py-6">
-      {/* Header */}
-      <header className="flex flex-wrap items-center gap-3">
-        <GdSelector
-          projects={projects}
-          selected={selectedGds}
-          onSelectionChange={setSelectedGds}
-          isLoading={isLoadingProjects}
-        />
+      {/* Filtros - todos al mismo nivel */}
+      <div className="flex flex-wrap items-end gap-4 rounded-lg border bg-white p-4 shadow-sm">
+        <div>
+          <label className="text-xs font-medium text-gray-500 mb-1 block">GD</label>
+          <GdSelector
+            projects={projects}
+            selected={selectedGds}
+            onSelectionChange={setSelectedGds}
+            isLoading={isLoadingProjects}
+          />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-gray-500 mb-1 block">Profesional</label>
+          <input
+            type="text"
+            placeholder="Buscar por nombre..."
+            value={profesional}
+            onChange={(e) => setProfesional(e.target.value)}
+            className="h-10 w-[200px] rounded-md border border-gray-300 px-3 text-sm focus:border-[hsl(153,100%,32.5%)] focus:ring-1 focus:ring-[hsl(153,100%,32.5%)]"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-gray-500 mb-1 block">Desde</label>
+          <input
+            type="date"
+            value={fechaDesde}
+            onChange={(e) => setFechaDesde(e.target.value)}
+            className="h-10 rounded-md border border-gray-300 px-3 text-sm focus:border-[hsl(153,100%,32.5%)] focus:ring-1 focus:ring-[hsl(153,100%,32.5%)]"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-gray-500 mb-1 block">Hasta</label>
+          <input
+            type="date"
+            value={fechaHasta}
+            onChange={(e) => setFechaHasta(e.target.value)}
+            className="h-10 rounded-md border border-gray-300 px-3 text-sm focus:border-[hsl(153,100%,32.5%)] focus:ring-1 focus:ring-[hsl(153,100%,32.5%)]"
+          />
+        </div>
+        {hasFilters && (
+          <button
+            onClick={clearFilters}
+            className="h-10 flex items-center gap-1 rounded-md border border-red-300 px-3 text-sm text-red-600 hover:bg-red-50"
+          >
+            <X className="h-4 w-4" /> Limpiar
+          </button>
+        )}
         <div className="ml-auto text-right">
           <p className="text-xs text-gray-400">Última actualización</p>
           <p className="text-sm font-medium text-gray-600">
             {dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleString('es-CO') : 'Sin consultar aún'}
           </p>
         </div>
-      </header>
-
-      {/* Filtros */}
-      <EquipoFilters filters={filters} onFiltersChange={setFilters} />
+      </div>
 
       {/* Loading */}
       {isLoadingIssues && selectedGds.length > 0 && (
         <div className="flex items-center justify-center py-12">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-[hsl(153,100%,32.5%)] border-t-transparent" />
           <span className="ml-3 text-sm text-gray-500">Cargando datos del equipo...</span>
         </div>
       )}
@@ -105,7 +132,13 @@ export function EquipoPage() {
           </h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {personData.map(({ name, issues }) => (
-              <PersonDetailCard key={name} name={name} issues={issues} allGds={selectedGds} />
+              <PersonDetailCard
+                key={name}
+                name={name}
+                issues={issues}
+                isExpanded={expandedPerson === name}
+                onToggleExpand={() => setExpandedPerson(expandedPerson === name ? null : name)}
+              />
             ))}
           </div>
         </div>
