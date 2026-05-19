@@ -1,10 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
+import { EquipoPage } from '@/features/equipo/EquipoPage'
 
-/**
- * Detecta el basename desde el tag <base> del HTML o usa '/'.
- * En GitHub Pages será '/dashboard-incidencias/', en local '/'.
- */
 const basename = import.meta.env.BASE_URL || '/'
 
 const router = createBrowserRouter(
@@ -13,11 +10,14 @@ const router = createBrowserRouter(
       path: '/',
       element: <DashboardPage />,
     },
+    {
+      path: '/equipo',
+      element: <EquipoPage />,
+    },
   ],
   { basename }
 )
 
-/** React Router con ruta principal del dashboard. */
 export function AppRouter() {
   return <RouterProvider router={router} />
 }
