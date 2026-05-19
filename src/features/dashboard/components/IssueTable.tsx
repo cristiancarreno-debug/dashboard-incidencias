@@ -58,8 +58,8 @@ const SORTABLE_COLUMNS: { key: SortColumn; label: string }[] = [
   { key: 'tipo', label: 'Tipo' },
   { key: 'status', label: 'Estado' },
   { key: 'assignee', label: 'Responsable' },
-  { key: 'created', label: 'Creado' },
   { key: 'riceScore', label: 'RICE' },
+  { key: 'created', label: 'Creado' },
 ]
 
 /**
@@ -208,14 +208,16 @@ export function IssueTable({
                   {issue.created.slice(0, 10)}
                 </td>
                 <td className="px-3 py-2">
-                  <button
-                    type="button"
-                    onClick={() => onIssueAction(issue.key)}
-                    className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                    aria-label={`Acciones para ${issue.key}`}
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </button>
+                  <div className="relative inline-block">
+                    <button
+                      type="button"
+                      onClick={() => onIssueAction(issue.key)}
+                      className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                      aria-label={`Acciones para ${issue.key}`}
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

@@ -110,7 +110,7 @@ export function InitiativeSelector({
                       <div
                         key={`${gd}-${initiative.key}`}
                         className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-gray-100"
-                        onClick={(e) => { e.stopPropagation(); toggleInitiative(initiative.key) }}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleInitiative(initiative.key) }}
                       >
                         <input
                           type="checkbox"
