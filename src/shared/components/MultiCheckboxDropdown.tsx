@@ -44,6 +44,7 @@ export function MultiCheckboxDropdown({
     onSelectionChange(next)
   }
 
+  const handleSelectAll = () => { onSelectionChange(new Set(options.map((o) => o.value))) }
   const handleSelectNone = () => { onSelectionChange(new Set()) }
 
   const selectedCount = selected.size
@@ -73,6 +74,7 @@ export function MultiCheckboxDropdown({
               className="w-full rounded border border-gray-200 px-2 py-1 text-sm outline-none focus:border-blue-400" />
           </div>
           <div className="flex gap-1 border-b px-2 py-1.5">
+            <button type="button" onClick={handleSelectAll} className="rounded px-2 py-0.5 text-xs text-blue-600 hover:bg-blue-50">✓ Todos</button>
             <button type="button" onClick={handleSelectNone} className="rounded px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-50">✕ Ninguno</button>
           </div>
           <div className="max-h-56 overflow-y-auto p-1">
