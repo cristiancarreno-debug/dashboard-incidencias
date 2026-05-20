@@ -73,6 +73,7 @@ function GdMultiSelect({ projects, selected, onChange, isLoading }: {
 
 export function EquipoPage() {
   const { data: projects = [], isLoading: isLoadingProjects } = useProjects()
+  const projectKeys = useMemo(() => projects.map((p) => p.key), [projects])
   const [selectedGds, setSelectedGds] = useState<string[]>([])
   const [profesional, setProfesional] = useState('')
   const [fechaDesde, setFechaDesde] = useState('')
