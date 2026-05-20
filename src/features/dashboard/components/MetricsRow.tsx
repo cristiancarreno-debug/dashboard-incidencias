@@ -30,17 +30,17 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
   return (
     <div className="flex w-full">
       {/* Resumen */}
-      <div className="pr-4">
+      <div className="flex-1 pr-4">
         <p className="text-xs font-semibold text-gray-600 mb-2">Resumen <span className="font-normal text-gray-400">({selectedGds.join(', ')})</span></p>
         <div className="flex gap-2">
-          <div className="flex items-center gap-2 rounded-lg border bg-white px-4 py-3 shadow-sm">
+          <div className="flex items-center gap-2 rounded-lg border bg-white px-4 py-3 shadow-sm flex-1">
             <LayoutDashboard className="h-5 w-5 text-gray-600 shrink-0" />
             <div>
               <p className="text-xl font-bold">{datasetCompleto.length}</p>
               <p className="text-[10px] text-gray-500">Total</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 shadow-sm">
+          <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 shadow-sm flex-1">
             <FolderKanban className="h-5 w-5 text-amber-600 shrink-0" />
             <div>
               <p className="text-xl font-bold text-amber-900">{datasetActivo.length}</p>
@@ -58,7 +58,7 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
         <p className="text-xs font-semibold text-gray-600 mb-2">Clasificación de incidencias abiertas</p>
         <div className="flex gap-2">
           {Object.entries(kpis.byType).map(([tipo, count]) => (
-            <div key={tipo} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm">
+            <div key={tipo} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm flex-1">
               {TYPE_ICONS[tipo] ?? <ClipboardList className="h-4 w-4 text-gray-400 shrink-0" />}
               <div>
                 <p className="text-xl font-bold">{count}</p>
@@ -73,11 +73,11 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
       <div className="w-[2px] bg-black self-stretch shrink-0" />
 
       {/* Clasificación por priorización RICE */}
-      <div className="pl-4">
+      <div className="flex-1 pl-4">
         <p className="text-xs font-semibold text-gray-600 mb-2">Clasificación por priorización RICE</p>
         <div className="flex gap-2">
           {RICE_CONFIG.map(({ key, color, icon }) => (
-            <div key={key} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm" style={{ borderLeftWidth: '3px', borderLeftColor: color }}>
+            <div key={key} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm flex-1" style={{ borderLeftWidth: '3px', borderLeftColor: color }}>
               {icon}
               <div>
                 <p className="text-xl font-bold">{kpis.byRicePriority[key] ?? 0}</p>
