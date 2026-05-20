@@ -31,12 +31,12 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
     <div className="w-full">
       {/* Títulos */}
       <div className="grid grid-cols-10 gap-2 mb-2">
-        <p className="col-span-2 text-xs font-semibold text-gray-600">Resumen <span className="font-normal text-gray-400">({selectedGds.join(', ')})</span></p>
-        <p className="col-span-4 text-xs font-semibold text-gray-600">Clasificación de incidencias abiertas</p>
+        <p className="col-span-2 text-xs font-semibold text-gray-600 border-r border-gray-200 pr-2">Resumen <span className="font-normal text-gray-400">({selectedGds.join(', ')})</span></p>
+        <p className="col-span-4 text-xs font-semibold text-gray-600 border-r border-gray-200 pr-2">Clasificación de incidencias abiertas</p>
         <p className="col-span-4 text-xs font-semibold text-gray-600">Clasificación por priorización RICE</p>
       </div>
       {/* Cards — 10 columnas iguales */}
-      <div className="grid grid-cols-10 gap-2">
+      <div className="grid grid-cols-[1fr_1fr_1px_1fr_1fr_1fr_1fr_1px_1fr_1fr_1fr_1fr] gap-2 items-center">
         {/* Total */}
         <div className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm">
           <LayoutDashboard className="h-5 w-5 text-gray-600 shrink-0" />
@@ -53,6 +53,8 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
             <p className="text-[10px] text-amber-600">Abiertos</p>
           </div>
         </div>
+        {/* Separador */}
+        <div className="w-px h-12 bg-gray-200 justify-self-center" />
         {/* Tipología (4 cards) */}
         {Object.entries(kpis.byType).map(([tipo, count]) => (
           <div key={tipo} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm">
@@ -63,6 +65,8 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
             </div>
           </div>
         ))}
+        {/* Separador */}
+        <div className="w-px h-12 bg-gray-200 justify-self-center" />
         {/* RICE (4 cards) */}
         {RICE_CONFIG.map(({ key, color, icon }) => (
           <div key={key} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm" style={{ borderLeftWidth: '3px', borderLeftColor: color }}>
