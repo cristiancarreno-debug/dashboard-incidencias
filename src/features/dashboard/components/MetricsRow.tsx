@@ -58,7 +58,7 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
         <p className="text-xs font-semibold text-gray-600 mb-2">Clasificación de incidencias abiertas</p>
         <div className="flex gap-2">
           {Object.entries(kpis.byType).map(([tipo, count]) => (
-            <div key={tipo} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm flex-1">
+            <div key={tipo} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm">
               {TYPE_ICONS[tipo] ?? <ClipboardList className="h-4 w-4 text-gray-400 shrink-0" />}
               <div>
                 <p className="text-xl font-bold">{count}</p>
