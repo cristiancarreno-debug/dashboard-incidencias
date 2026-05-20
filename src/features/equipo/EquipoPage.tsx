@@ -102,6 +102,12 @@ export function EquipoPage() {
   const isLoading = isLoadingByGd || isLoadingByUser
   const dataUpdatedAt = updatedGd || updatedUser
 
+  const projectNamesMap = useMemo(() => {
+    const map: Record<string, string> = {}
+    for (const p of projects) { map[p.key] = p.name }
+    return map
+  }, [projects])
+
   const enrichedIssues = useMemo(() => rawIssues.map((raw) => enrichIssue(raw, riceAnalyze)), [rawIssues])
 
   // Filtrar por fecha
@@ -223,7 +229,7 @@ export function EquipoPage() {
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {personData.map(({ name, issues }) => (
-                <PersonDetailCard key={name} name={name} issues={issues}
+                <PersonDetailCard key={name} name={name} issues={issues} projectNames={projectNamesMap}
                   expandedSection={expandedPerson === name ? expandedSection : null}
                   onToggleSection={(section) => {
                     if (expandedPerson === name && expandedSection === section) {

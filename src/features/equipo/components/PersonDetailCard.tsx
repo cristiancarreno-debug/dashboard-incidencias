@@ -5,6 +5,7 @@ import type { EnrichedIssue } from '@/features/rice/rice.types'
 interface Props {
   name: string
   issues: EnrichedIssue[]
+  projectNames: Record<string, string>
   expandedSection: 'abiertas' | 'cerradas' | null
   onToggleSection: (section: 'abiertas' | 'cerradas') => void
 }
@@ -34,7 +35,7 @@ function IssueList({ issues, maxVisible = 5 }: { issues: EnrichedIssue[]; maxVis
   )
 }
 
-export function PersonDetailCard({ name, issues, expandedSection, onToggleSection }: Props) {
+export function PersonDetailCard({ name, issues, projectNames, expandedSection, onToggleSection }: Props) {
   const tablerosAsignados = [...new Set(issues.map((i) => i.project))]
   const abiertas = issues.filter((i) => !TERMINAL_STATES.has(i.status))
   const cerradas = issues.filter((i) => TERMINAL_STATES.has(i.status))
@@ -74,7 +75,7 @@ export function PersonDetailCard({ name, issues, expandedSection, onToggleSectio
         <p className="text-[10px] text-gray-500 uppercase mb-1">Tableros:</p>
         <div className="flex flex-wrap gap-1">
           {tablerosAsignados.map((t) => (
-            <span key={t} className="rounded bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-700">{t}</span>
+            <span key={t} title={projectNames[t] || t} className="rounded bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-700 cursor-help">{t}</span>
           ))}
         </div>
       </div>
