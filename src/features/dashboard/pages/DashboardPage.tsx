@@ -177,10 +177,7 @@ export function DashboardPage() {
             <p className="text-[10px] text-gray-400">Última actualización</p>
             <p className="text-xs font-medium text-gray-600">{lastUpdateRef.current > 0 ? new Date(lastUpdateRef.current).toLocaleString("es-CO") : "Sin consultar aún"}</p>
           </div>
-          <RefreshButton
-            onRefresh={onRefresh}
-            isRefreshing={isFetching}
-          />
+
         </div>
       </header>
 
