@@ -156,14 +156,13 @@ export function DashboardPage() {
   return (
     <div className="w-full space-y-6 px-6 py-6">
       {/* Header: Selectores + Refresh */}
-      <header className="flex flex-wrap items-center gap-3">
+      <header className="flex items-center gap-2 w-full">
         <GdSelector
           projects={projects}
           selected={selectedGds}
           onSelectionChange={setSelectedGds}
           isLoading={isLoadingProjects}
         />
-        
         {selectedGds.length > 0 && !isLoadingIssues && (
           <FilterBar
             issues={filteredByInitiatives}
@@ -173,10 +172,10 @@ export function DashboardPage() {
             onSearchChange={setSearchQuery}
           />
         )}
-        <div className="ml-auto flex items-center gap-3">
+        <div className="shrink-0 flex items-center gap-3 ml-auto">
           <div className="text-right">
-            <p className="text-xs text-gray-400">Última actualización</p>
-            <p className="text-sm font-medium text-gray-600">{lastUpdateRef.current > 0 ? new Date(lastUpdateRef.current).toLocaleString("es-CO") : "Sin consultar aún"}</p>
+            <p className="text-[10px] text-gray-400">Última actualización</p>
+            <p className="text-xs font-medium text-gray-600">{lastUpdateRef.current > 0 ? new Date(lastUpdateRef.current).toLocaleString("es-CO") : "Sin consultar aún"}</p>
           </div>
           <RefreshButton
             onRefresh={onRefresh}
