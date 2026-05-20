@@ -31,8 +31,8 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
     <div className="w-full">
       {/* Títulos */}
       <div className="grid grid-cols-10 gap-2 mb-2">
-        <p className="col-span-2 text-xs font-semibold text-gray-600 border-r border-gray-200 pr-2">Resumen <span className="font-normal text-gray-400">({selectedGds.join(', ')})</span></p>
-        <p className="col-span-4 text-xs font-semibold text-gray-600 border-r border-gray-200 pr-2">Clasificación de incidencias abiertas</p>
+        <p className="col-span-2 text-xs font-semibold text-gray-600 border-r-[3px] border-black pr-3">Resumen <span className="font-normal text-gray-400">({selectedGds.join(', ')})</span></p>
+        <p className="col-span-4 text-xs font-semibold text-gray-600 border-r-[3px] border-black pr-3">Clasificación de incidencias abiertas</p>
         <p className="col-span-4 text-xs font-semibold text-gray-600">Clasificación por priorización RICE</p>
       </div>
       {/* Cards — 10 columnas iguales */}
@@ -54,7 +54,7 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
           </div>
         </div>
         {/* Separador */}
-        <div className="w-px h-12 bg-gray-200 justify-self-center" />
+        <div className="w-[3px] h-16 bg-black rounded-full justify-self-center" />
         {/* Tipología (4 cards) */}
         {Object.entries(kpis.byType).map(([tipo, count]) => (
           <div key={tipo} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm">
@@ -66,7 +66,7 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
           </div>
         ))}
         {/* Separador */}
-        <div className="w-px h-12 bg-gray-200 justify-self-center" />
+        <div className="w-[3px] h-16 bg-black rounded-full justify-self-center" />
         {/* RICE (4 cards) */}
         {RICE_CONFIG.map(({ key, color, icon }) => (
           <div key={key} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm" style={{ borderLeftWidth: '3px', borderLeftColor: color }}>
