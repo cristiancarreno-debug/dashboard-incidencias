@@ -1,16 +1,16 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { useProjects } from '@/features/jira/hooks/useProjects'
-import { useUserSearch } from '@/features/jira/hooks/useUserSearch'
 import { useIssues } from '@/features/jira/hooks/useIssues'
+import { useIssuesByAssignee } from '@/features/jira/hooks/useIssuesByAssignee'
+import { useUserSearch } from '@/features/jira/hooks/useUserSearch'
 import { enrichIssue } from '@/features/dashboard/utils/metrics'
 import { riceAnalyze } from '@/features/rice/rice-engine'
 import { PersonDetailCard } from './components/PersonDetailCard'
-import { TERMINAL_STATES } from '@/config/constants'
-import type { EnrichedIssue } from '@/features/rice/rice.types'
 import { X, ChevronsUpDown, Square } from 'lucide-react'
+import type { EnrichedIssue } from '@/features/rice/rice.types'
 import type { JiraProject } from '@/features/jira/types/jira.types'
 
-/** GD Selector con Ninguno */
+/** GD Selector */
 function GdMultiSelect({ projects, selected, onChange, isLoading }: {
   projects: JiraProject[]; selected: string[]; onChange: (v: string[]) => void; isLoading: boolean
 }) {
@@ -38,17 +38,13 @@ function GdMultiSelect({ projects, selected, onChange, isLoading }: {
 
   return (
     <div className="relative" ref={ref}>
-      <button
-        onClick={() => setOpen(!open)}
-        disabled={isLoading}
-        className="flex h-10 w-[220px] items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-50"
-      >
+      <button onClick={() => setOpen(!open)} disabled={isLoading}
+        className="flex h-10 w-[180px] items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-50">
         <span className="truncate">{isLoading ? 'Cargando...' : label}</span>
         <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
       </button>
       {open && (
         <div className="absolute top-full left-0 z-50 mt-1 w-[260px] rounded-md border border-gray-200 bg-white shadow-lg">
-          {/* Ninguno */}
           <div className="flex border-b px-2 py-1.5">
             <button onClick={() => onChange([])} className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-500 hover:bg-gray-50 rounded">
               <Square className="h-3 w-3" /> Ninguno
@@ -60,7 +56,7 @@ function GdMultiSelect({ projects, selected, onChange, isLoading }: {
           <div className="max-h-[250px] overflow-y-auto p-1">
             {filtered.map((p) => (
               <div key={p.key} className="flex items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-gray-100 cursor-pointer" onClick={() => toggle(p.key)}>
-                <input type="checkbox" checked={selected.includes(p.key)} readOnly className="h-4 w-4 rounded border-gray-300 accent-[hsl(153,100%,32.5%)] pointer-events-none" />
+                <input type="checkbox" checked={selected.includes(p.key)} readOnly className="h-4 w-4 rounded border-gray-300 pointer-events-none" />
                 <span className="font-medium">{p.key}</span>
                 <span className="truncate text-gray-500 text-xs">{p.name}</span>
               </div>
@@ -74,22 +70,41 @@ function GdMultiSelect({ projects, selected, onChange, isLoading }: {
 
 export function EquipoPage() {
   const { data: projects = [], isLoading: isLoadingProjects } = useProjects()
-  const projectKeys = useMemo(() => projects.map((p) => p.key), [projects])
   const [selectedGds, setSelectedGds] = useState<string[]>([])
-  const [profesional, setProfesional] = useState('')
-  const [selectedUser, setSelectedUser] = useState<string | null>(null)
-  const { data: userSuggestions = [] } = useUserSearch(selectedUser ? '' : profesional)
+  const [profesionalInput, setProfesionalInput] = useState('')
+  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null)
+  const [selectedName, setSelectedName] = useState<string | null>(null)
   const [fechaDesde, setFechaDesde] = useState('')
   const [fechaHasta, setFechaHasta] = useState('')
   const [expandedPerson, setExpandedPerson] = useState<string | null>(null)
   const [expandedSection, setExpandedSection] = useState<'abiertas' | 'cerradas' | null>(null)
 
-  // Si hay profesional pero no GD, buscar en todos los proyectos
-  const queryGds = selectedGds.length > 0 ? selectedGds : (profesional.length >= 3 ? projectKeys : [])
-  const { data: rawIssues = [], isLoading: isLoadingIssues, dataUpdatedAt } = useIssues(queryGds)
+  // Autocomplete: buscar usuarios en Jira
+  const { data: userSuggestions = [] } = useUserSearch(selectedAccountId ? '' : profesionalInput)
+
+  // Modo 1: por GD
+  const { data: rawIssuesByGd = [], isLoading: isLoadingByGd, dataUpdatedAt: updatedGd } = useIssues(selectedGds)
+
+  // Modo 2: por profesional (accountId)
+  const { data: rawIssuesByUser = [], isLoading: isLoadingByUser, dataUpdatedAt: updatedUser } = useIssuesByAssignee(selectedAccountId)
+
+  // Combinar resultados: si hay GD usa esos, si hay usuario usa esos, si ambos combina
+  const rawIssues = useMemo(() => {
+    if (selectedGds.length > 0 && selectedAccountId) {
+      // Ambos: issues del GD filtradas por el usuario
+      return rawIssuesByGd
+    }
+    if (selectedGds.length > 0) return rawIssuesByGd
+    if (selectedAccountId) return rawIssuesByUser
+    return []
+  }, [rawIssuesByGd, rawIssuesByUser, selectedGds, selectedAccountId])
+
+  const isLoading = isLoadingByGd || isLoadingByUser
+  const dataUpdatedAt = updatedGd || updatedUser
 
   const enrichedIssues = useMemo(() => rawIssues.map((raw) => enrichIssue(raw, riceAnalyze)), [rawIssues])
 
+  // Filtrar por fecha
   const filteredByDate = useMemo(() => {
     return enrichedIssues.filter((issue) => {
       const created = issue.created.slice(0, 10)
@@ -99,42 +114,62 @@ export function EquipoPage() {
     })
   }, [enrichedIssues, fechaDesde, fechaHasta])
 
+  // Filtrar por nombre (solo si hay GD seleccionado y se escribió nombre)
   const personData = useMemo(() => {
     const map = new Map<string, EnrichedIssue[]>()
     for (const issue of filteredByDate) {
       const name = issue.assignee || 'Sin asignar'
-      if (profesional) {
-        const searchTerm = profesional.toLowerCase().trim()
-        const nameLower = name.toLowerCase()
-        // Match if name contains search term OR search term contains name
-        if (!nameLower.includes(searchTerm) && !searchTerm.includes(nameLower)) continue
+      // Si se seleccionó un usuario específico y estamos en modo GD, filtrar
+      if (selectedGds.length > 0 && selectedName) {
+        if (!name.toLowerCase().includes(selectedName.toLowerCase())) continue
       }
       const list = map.get(name) ?? []
       list.push(issue)
       map.set(name, list)
     }
     return Array.from(map.entries()).map(([name, issues]) => ({ name, issues })).sort((a, b) => b.issues.length - a.issues.length)
-  }, [filteredByDate, profesional])
+  }, [filteredByDate, selectedGds, selectedName])
 
-  const hasFilters = profesional || fechaDesde || fechaHasta || selectedGds.length > 0
-  const clearAll = () => { setProfesional(''); setSelectedUser(null); setFechaDesde(''); setFechaHasta(''); setSelectedGds([]) }
+  const hasFilters = selectedGds.length > 0 || selectedAccountId || fechaDesde || fechaHasta
+  const hasData = selectedGds.length > 0 || selectedAccountId
+
+  const clearAll = () => {
+    setSelectedGds([]); setProfesionalInput(''); setSelectedAccountId(null)
+    setSelectedName(null); setFechaDesde(''); setFechaHasta('')
+  }
+
+  const handleSelectUser = (accountId: string, displayName: string) => {
+    setSelectedAccountId(accountId)
+    setSelectedName(displayName)
+    setProfesionalInput(displayName)
+  }
+
+  const handleProfesionalChange = (value: string) => {
+    setProfesionalInput(value)
+    if (selectedAccountId) {
+      setSelectedAccountId(null)
+      setSelectedName(null)
+    }
+  }
 
   return (
     <div className="w-full space-y-6 px-6 py-6">
-      <div className="flex flex-wrap items-end gap-4 rounded-lg border bg-white p-4 shadow-sm">
+      {/* Filtros */}
+      <div className="flex items-end gap-4 rounded-lg border bg-white p-4 shadow-sm">
         <div>
           <label className="text-xs font-medium text-gray-500 mb-1 block">GD</label>
           <GdMultiSelect projects={projects} selected={selectedGds} onChange={setSelectedGds} isLoading={isLoadingProjects} />
         </div>
         <div className="relative">
           <label className="text-xs font-medium text-gray-500 mb-1 block">Profesional</label>
-          <input type="text" placeholder="Buscar (min 3 letras)..." value={profesional} onChange={(e) => { setProfesional(e.target.value); setSelectedUser(null) }}
-            className="h-10 w-[220px] rounded-md border border-gray-300 px-3 text-sm" />
-          {profesional.length >= 3 && userSuggestions.length > 0 && !selectedUser && (
-            <div className="absolute top-full left-0 z-50 mt-1 w-[280px] rounded-md border border-gray-200 bg-white shadow-lg max-h-48 overflow-y-auto">
+          <input type="text" placeholder="Min 3 letras..." value={profesionalInput}
+            onChange={(e) => handleProfesionalChange(e.target.value)}
+            className="h-10 w-[240px] rounded-md border border-gray-300 px-3 text-sm" />
+          {profesionalInput.length >= 3 && !selectedAccountId && userSuggestions.length > 0 && (
+            <div className="absolute top-full left-0 z-50 mt-1 w-[300px] rounded-md border border-gray-200 bg-white shadow-lg max-h-48 overflow-y-auto">
               {userSuggestions.map((user) => (
                 <div key={user.accountId} className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
-                  onClick={() => { setProfesional(user.displayName); setSelectedUser(user.displayName) }}>
+                  onClick={() => handleSelectUser(user.accountId, user.displayName)}>
                   {user.displayName}
                 </div>
               ))}
@@ -157,46 +192,50 @@ export function EquipoPage() {
           </button>
         )}
         <div className="ml-auto text-right">
-          <p className="text-xs text-gray-400">Última actualización</p>
-          <p className="text-sm font-medium text-gray-600">{dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleString('es-CO') : 'Sin consultar aún'}</p>
+          <p className="text-[10px] text-gray-400">Última actualización</p>
+          <p className="text-xs font-medium text-gray-600">{dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleString('es-CO') : 'Sin consultar aún'}</p>
         </div>
       </div>
 
-      {isLoadingIssues && queryGds.length > 0 && (
+      {/* Loading */}
+      {isLoading && hasData && (
         <div className="flex items-center justify-center py-12">
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-[hsl(153,100%,32.5%)] border-t-transparent" />
           <span className="ml-3 text-sm text-gray-500">Cargando...</span>
         </div>
       )}
 
-      {selectedGds.length === 0 && profesional.length < 3 && !isLoadingProjects && (
+      {/* Empty state */}
+      {!hasData && !isLoadingProjects && (
         <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center">
-          <p className="text-gray-500">Selecciona uno o más GDs o escribe al menos 3 caracteres del nombre del profesional.</p>
+          <p className="text-gray-500">Selecciona un GD o busca un profesional para ver las asignaciones.</p>
         </div>
       )}
 
-      {queryGds.length > 0 && !isLoadingIssues && (
+      {/* Cards */}
+      {hasData && !isLoading && (
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
             Equipo ({personData.length} integrantes — {filteredByDate.length} incidencias)
           </h3>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {personData.map(({ name, issues }) => (
-              <PersonDetailCard
-                key={name}
-                name={name}
-                issues={issues}
-                expandedSection={expandedPerson === name ? expandedSection : null}
-                onToggleSection={(section) => {
-                  if (expandedPerson === name && expandedSection === section) {
-                    setExpandedPerson(null); setExpandedSection(null)
-                  } else {
-                    setExpandedPerson(name); setExpandedSection(section)
-                  }
-                }}
-              />
-            ))}
-          </div>
+          {personData.length === 0 ? (
+            <p className="text-gray-500 text-sm">No se encontraron resultados.</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {personData.map(({ name, issues }) => (
+                <PersonDetailCard key={name} name={name} issues={issues}
+                  expandedSection={expandedPerson === name ? expandedSection : null}
+                  onToggleSection={(section) => {
+                    if (expandedPerson === name && expandedSection === section) {
+                      setExpandedPerson(null); setExpandedSection(null)
+                    } else {
+                      setExpandedPerson(name); setExpandedSection(section)
+                    }
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
