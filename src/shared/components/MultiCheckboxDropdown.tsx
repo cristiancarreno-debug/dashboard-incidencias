@@ -14,9 +14,6 @@ export interface MultiCheckboxDropdownProps {
   onSelectionChange: (selected: Set<string>) => void
 }
 
-/**
- * Dropdown with multi-checkbox selection — implementación nativa sin Radix.
- */
 export function MultiCheckboxDropdown({
   label,
   options,
@@ -43,24 +40,11 @@ export function MultiCheckboxDropdown({
 
   const handleToggle = (value: string) => {
     const next = new Set(selected)
-    if (next.has(value)) {
-      next.delete(value)
-    } else {
-      next.add(value)
-    }
+    if (next.has(value)) { next.delete(value) } else { next.add(value) }
     onSelectionChange(next)
   }
 
-    onSelectionChange(new Set(options.map((o) => o.value)))
-  }
-
-  const handleSelectNone = () => {
-    onSelectionChange(new Set())
-  }
-
-  const handleSelectVisible = () => {
-    onSelectionChange(new Set(filteredOptions.map((o) => o.value)))
-  }
+  const handleSelectNone = () => { onSelectionChange(new Set()) }
 
   const selectedCount = selected.size
 
@@ -77,9 +61,7 @@ export function MultiCheckboxDropdown({
       >
         {label}
         {selectedCount > 0 && (
-          <span className="rounded-full bg-blue-600 px-1.5 text-xs text-white">
-            {selectedCount}
-          </span>
+          <span className="rounded-full bg-blue-600 px-1.5 text-xs text-white">{selectedCount}</span>
         )}
         <ChevronDown className="h-3.5 w-3.5" />
       </button>
@@ -87,33 +69,20 @@ export function MultiCheckboxDropdown({
       {open && (
         <div className="absolute top-full left-0 z-50 mt-1 w-64 rounded-md border border-gray-200 bg-white shadow-lg">
           <div className="border-b p-2">
-            <input
-              type="text"
-              placeholder="Buscar..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded border border-gray-200 px-2 py-1 text-sm outline-none focus:border-blue-400"
-            />
+            <input type="text" placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded border border-gray-200 px-2 py-1 text-sm outline-none focus:border-blue-400" />
           </div>
           <div className="flex gap-1 border-b px-2 py-1.5">
-            <button type="button" onClick={handleSelectNone} className="rounded px-2 py-0.5 text-xs text-blue-600 hover:bg-blue-50">Ninguno</button>
-            <button type="button" onClick={handleSelectVisible} className="rounded px-2 py-0.5 text-xs text-blue-600 hover:bg-blue-50">Solo visibles</button>
+            <button type="button" onClick={handleSelectNone} className="rounded px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-50">✕ Ninguno</button>
           </div>
           <div className="max-h-56 overflow-y-auto p-1">
             {filteredOptions.length === 0 ? (
               <p className="px-2 py-3 text-center text-xs text-gray-400">Sin resultados</p>
             ) : (
               filteredOptions.map((opt) => (
-                <label
-                  key={opt.value}
-                  className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-sm hover:bg-gray-50"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selected.has(opt.value)}
-                    onChange={() => handleToggle(opt.value)}
-                    className="h-3.5 w-3.5 rounded border-gray-300 text-blue-600"
-                  />
+                <label key={opt.value} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-sm hover:bg-gray-50">
+                  <input type="checkbox" checked={selected.has(opt.value)} onChange={() => handleToggle(opt.value)}
+                    className="h-3.5 w-3.5 rounded border-gray-300 text-blue-600" />
                   <span className="flex-1 truncate">{opt.value}</span>
                   <span className="text-xs text-gray-400">{opt.count}</span>
                 </label>
