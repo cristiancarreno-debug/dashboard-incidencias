@@ -28,7 +28,7 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
   const kpis = computeKpis(datasetActivo)
 
   return (
-    <div className="flex items-start gap-4 w-full">
+    <div className="flex items-start justify-between gap-4 w-full">
       {/* Resumen */}
       <div className="shrink-0">
         <p className="text-xs font-semibold text-gray-600 mb-2">Resumen <span className="font-normal text-gray-400">({selectedGds.join(', ')})</span></p>
@@ -54,11 +54,11 @@ export function MetricsRow({ datasetCompleto, datasetActivo, selectedGds }: Prop
       <div className="w-px self-stretch bg-gray-200 shrink-0" />
 
       {/* Clasificación de incidencias abiertas */}
-      <div className="flex-1 min-w-0">
+      <div className="shrink-0">
         <p className="text-xs font-semibold text-gray-600 mb-2">Clasificación de incidencias abiertas</p>
         <div className="flex gap-2">
           {Object.entries(kpis.byType).map(([tipo, count]) => (
-            <div key={tipo} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm flex-1">
+            <div key={tipo} className="flex items-center gap-2 rounded-lg border bg-white px-3 py-3 shadow-sm">
               {TYPE_ICONS[tipo] ?? <ClipboardList className="h-4 w-4 text-gray-400" />}
               <div>
                 <p className="text-2xl font-bold">{count}</p>
