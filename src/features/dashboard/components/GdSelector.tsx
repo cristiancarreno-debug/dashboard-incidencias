@@ -86,7 +86,6 @@ export function GdSelector({
             />
           </div>
           <div className="flex border-b px-2 py-1.5">
-            <button onClick={() => onSelectionChange(projects.map(p => p.key))} className="flex-1 text-xs text-blue-600 hover:bg-blue-50 rounded px-2 py-1">✓ Todos</button>
             <button onClick={() => onSelectionChange([])} className="flex-1 text-xs text-gray-500 hover:bg-gray-50 rounded px-2 py-1">✗ Ninguno</button>
           </div>
           <div className="max-h-[300px] overflow-y-auto p-1">

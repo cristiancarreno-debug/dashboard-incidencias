@@ -9,7 +9,7 @@ import { X, ChevronsUpDown, CheckSquare, Square } from 'lucide-react'
 import type { EnrichedIssue } from '@/features/rice/rice.types'
 import type { JiraProject } from '@/features/jira/types/jira.types'
 
-/** GD Selector con Todos/Ninguno */
+/** GD Selector con Ninguno */
 function GdMultiSelect({ projects, selected, onChange, isLoading }: {
   projects: JiraProject[]; selected: string[]; onChange: (v: string[]) => void; isLoading: boolean
 }) {
@@ -47,7 +47,7 @@ function GdMultiSelect({ projects, selected, onChange, isLoading }: {
       </button>
       {open && (
         <div className="absolute top-full left-0 z-50 mt-1 w-[260px] rounded-md border border-gray-200 bg-white shadow-lg">
-          {/* Todos / Ninguno */}
+          {/* Ninguno */}
           <div className="flex border-b px-2 py-1.5">
             <button onClick={() => onChange([])} className="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs text-gray-500 hover:bg-gray-50 rounded">
               <Square className="h-3 w-3" /> Ninguno
