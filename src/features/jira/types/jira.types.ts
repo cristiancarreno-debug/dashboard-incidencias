@@ -18,6 +18,7 @@ export interface RawJiraIssue {
     created: string
     issuetype: { name: string }
     parent?: { key: string; fields: { summary: string } } | null
+    timespent: number | null
   }
 }
 

@@ -27,6 +27,7 @@ export const JiraIssueSchema = z.object({
       })
       .nullable()
       .optional(),
+    timespent: z.number().nullable().optional(),
   }),
 })
 

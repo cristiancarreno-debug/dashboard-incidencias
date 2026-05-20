@@ -39,7 +39,8 @@ export function PersonDetailCard({ name, issues, projectNames, expandedSection, 
   const tablerosAsignados = [...new Set(issues.map((i) => i.project))]
   const abiertas = issues.filter((i) => !TERMINAL_STATES.has(i.status))
   const cerradas = issues.filter((i) => TERMINAL_STATES.has(i.status))
-  const horasEstimadas = issues.length * 8
+  const totalSeconds = issues.reduce((sum, i) => sum + (i.timespentSeconds || 0), 0)
+  const horasReales = Math.round(totalSeconds / 3600 * 10) / 10
 
   const byType: Record<string, number> = {}
   for (const issue of issues) { byType[issue.tipo] = (byType[issue.tipo] || 0) + 1 }
@@ -56,8 +57,8 @@ export function PersonDetailCard({ name, issues, projectNames, expandedSection, 
       <div className="grid grid-cols-3 gap-2 mb-3">
         <div className="text-center p-2 rounded bg-gray-50">
           <Clock className="h-4 w-4 mx-auto text-gray-500 mb-1" />
-          <p className="text-lg font-bold text-gray-800">{horasEstimadas}h</p>
-          <p className="text-[10px] text-gray-500">Horas est.</p>
+          <p className="text-lg font-bold text-gray-800">{horasReales}h</p>
+          <p className="text-[10px] text-gray-500">Horas reg.</p>
         </div>
         <div className="text-center p-2 rounded bg-gray-50">
           <LayoutDashboard className="h-4 w-4 mx-auto text-gray-500 mb-1" />

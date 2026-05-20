@@ -19,7 +19,7 @@ export async function fetchIssuesByAssignee(displayName: string): Promise<RawJir
     const params: Record<string, string | number> = {
       jql,
       maxResults: PAGE_SIZE,
-      fields: 'summary,assignee,status,created,issuetype,parent',
+      fields: 'summary,assignee,status,created,issuetype,parent,timespent',
     }
     if (nextPageToken) params.nextPageToken = nextPageToken
 

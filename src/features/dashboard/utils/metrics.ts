@@ -286,5 +286,6 @@ export function enrichIssue(
     equipo: project,
     epic,
     rice,
+    timespentSeconds: raw.fields.timespent ?? 0,
   }
 }

@@ -43,6 +43,7 @@ export interface EnrichedIssue {
   equipo: string
   epic: string
   rice: RiceResult
+  timespentSeconds: number
 }
 
 /** Estado de filtros activos. */
