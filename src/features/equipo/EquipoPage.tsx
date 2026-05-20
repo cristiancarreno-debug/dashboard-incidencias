@@ -5,7 +5,6 @@ import { enrichIssue } from '@/features/dashboard/utils/metrics'
 import { riceAnalyze } from '@/features/rice/rice-engine'
 import { PersonDetailCard } from './components/PersonDetailCard'
 import { TERMINAL_STATES } from '@/config/constants'
-import { X, ChevronsUpDown, CheckSquare, Square } from 'lucide-react'
 import type { EnrichedIssue } from '@/features/rice/rice.types'
 import type { JiraProject } from '@/features/jira/types/jira.types'
 

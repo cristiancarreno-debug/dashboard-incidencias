@@ -51,7 +51,6 @@ export function MultiCheckboxDropdown({
     onSelectionChange(next)
   }
 
-  const handleSelectAll = () => {
     onSelectionChange(new Set(options.map((o) => o.value)))
   }
 
@@ -97,7 +96,6 @@ export function MultiCheckboxDropdown({
             />
           </div>
           <div className="flex gap-1 border-b px-2 py-1.5">
-            <button type="button" onClick={handleSelectAll} className="rounded px-2 py-0.5 text-xs text-blue-600 hover:bg-blue-50">Todos</button>
             <button type="button" onClick={handleSelectNone} className="rounded px-2 py-0.5 text-xs text-blue-600 hover:bg-blue-50">Ninguno</button>
             <button type="button" onClick={handleSelectVisible} className="rounded px-2 py-0.5 text-xs text-blue-600 hover:bg-blue-50">Solo visibles</button>
           </div>
