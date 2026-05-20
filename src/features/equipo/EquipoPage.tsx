@@ -6,6 +6,7 @@ import { riceAnalyze } from '@/features/rice/rice-engine'
 import { PersonDetailCard } from './components/PersonDetailCard'
 import { TERMINAL_STATES } from '@/config/constants'
 import type { EnrichedIssue } from '@/features/rice/rice.types'
+import { X, ChevronsUpDown, Square } from 'lucide-react'
 import type { JiraProject } from '@/features/jira/types/jira.types'
 
 /** GD Selector con Ninguno */
