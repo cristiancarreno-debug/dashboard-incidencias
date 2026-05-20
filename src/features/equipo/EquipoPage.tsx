@@ -103,7 +103,12 @@ export function EquipoPage() {
     const map = new Map<string, EnrichedIssue[]>()
     for (const issue of filteredByDate) {
       const name = issue.assignee || 'Sin asignar'
-      if (profesional && !name.toLowerCase().includes(profesional.toLowerCase())) continue
+      if (profesional) {
+        const searchTerm = profesional.toLowerCase().trim()
+        const nameLower = name.toLowerCase()
+        // Match if name contains search term OR search term contains name
+        if (!nameLower.includes(searchTerm) && !searchTerm.includes(nameLower)) continue
+      }
       const list = map.get(name) ?? []
       list.push(issue)
       map.set(name, list)
