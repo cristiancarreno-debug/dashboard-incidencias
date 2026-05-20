@@ -80,7 +80,9 @@ export function EquipoPage() {
   const [expandedPerson, setExpandedPerson] = useState<string | null>(null)
   const [expandedSection, setExpandedSection] = useState<'abiertas' | 'cerradas' | null>(null)
 
-  const { data: rawIssues = [], isLoading: isLoadingIssues, dataUpdatedAt } = useIssues(selectedGds)
+  // Si hay profesional pero no GD, buscar en todos los proyectos
+  const queryGds = selectedGds.length > 0 ? selectedGds : (profesional.length >= 3 ? projectKeys : [])
+  const { data: rawIssues = [], isLoading: isLoadingIssues, dataUpdatedAt } = useIssues(queryGds)
 
   const enrichedIssues = useMemo(() => rawIssues.map((raw) => enrichIssue(raw, riceAnalyze)), [rawIssues])
 
@@ -141,20 +143,20 @@ export function EquipoPage() {
         </div>
       </div>
 
-      {isLoadingIssues && selectedGds.length > 0 && (
+      {isLoadingIssues && queryGds.length > 0 && (
         <div className="flex items-center justify-center py-12">
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-[hsl(153,100%,32.5%)] border-t-transparent" />
           <span className="ml-3 text-sm text-gray-500">Cargando...</span>
         </div>
       )}
 
-      {selectedGds.length === 0 && !isLoadingProjects && (
+      {selectedGds.length === 0 && profesional.length < 3 && !isLoadingProjects && (
         <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center">
-          <p className="text-gray-500">Selecciona uno o más GDs para ver las asignaciones del equipo.</p>
+          <p className="text-gray-500">Selecciona uno o más GDs o escribe al menos 3 caracteres del nombre del profesional.</p>
         </div>
       )}
 
-      {selectedGds.length > 0 && !isLoadingIssues && (
+      {queryGds.length > 0 && !isLoadingIssues && (
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
             Equipo ({personData.length} integrantes — {filteredByDate.length} incidencias)
