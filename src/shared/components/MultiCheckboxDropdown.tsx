@@ -55,7 +55,7 @@ export function MultiCheckboxDropdown({
         type="button"
         onClick={() => setOpen(!open)}
         className={cn(
-          'inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm',
+          'flex items-center justify-between w-full rounded-md border px-3 py-1.5 text-sm',
           'hover:bg-gray-50 transition-colors',
           selectedCount > 0 ? 'border-blue-300 bg-blue-50 text-blue-700' : 'border-gray-300 text-gray-700'
         )}
