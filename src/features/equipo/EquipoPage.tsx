@@ -86,16 +86,16 @@ export function EquipoPage() {
   const { data: rawIssuesByGd = [], isLoading: isLoadingByGd, dataUpdatedAt: updatedGd } = useIssues(selectedGds)
 
   // Modo 2: por profesional (accountId)
-  const { data: rawIssuesByUser = [], isLoading: isLoadingByUser, dataUpdatedAt: updatedUser } = useIssuesByAssignee(selectedAccountId)
+  const { data: rawIssuesByUser = [], isLoading: isLoadingByUser, dataUpdatedAt: updatedUser } = useIssuesByAssignee(selectedName)
 
   // Combinar resultados: si hay GD usa esos, si hay usuario usa esos, si ambos combina
   const rawIssues = useMemo(() => {
-    if (selectedGds.length > 0 && selectedAccountId) {
+    if (selectedGds.length > 0 && selectedName) {
       // Ambos: issues del GD filtradas por el usuario
       return rawIssuesByGd
     }
     if (selectedGds.length > 0) return rawIssuesByGd
-    if (selectedAccountId) return rawIssuesByUser
+    if (selectedName) return rawIssuesByUser
     return []
   }, [rawIssuesByGd, rawIssuesByUser, selectedGds, selectedAccountId])
 

@@ -7,10 +7,10 @@ const PAGE_SIZE = 50
 /**
  * Busca todas las issues asignadas a un usuario específico por accountId.
  */
-export async function fetchIssuesByAssignee(accountId: string): Promise<RawJiraIssue[]> {
-  if (!accountId) return []
+export async function fetchIssuesByAssignee(displayName: string): Promise<RawJiraIssue[]> {
+  if (!displayName) return []
 
-  const jql = `assignee = "${accountId}" ORDER BY created DESC`
+  const jql = `assignee = "${displayName}" ORDER BY created DESC`
   const allIssues: RawJiraIssue[] = []
   let nextPageToken: string | null | undefined = undefined
   let isLast = false
