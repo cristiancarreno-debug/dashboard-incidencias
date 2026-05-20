@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { useProjects } from '@/features/jira/hooks/useProjects'
+import { useUserSearch } from '@/features/jira/hooks/useUserSearch'
 import { useIssues } from '@/features/jira/hooks/useIssues'
 import { enrichIssue } from '@/features/dashboard/utils/metrics'
 import { riceAnalyze } from '@/features/rice/rice-engine'
@@ -76,6 +77,8 @@ export function EquipoPage() {
   const projectKeys = useMemo(() => projects.map((p) => p.key), [projects])
   const [selectedGds, setSelectedGds] = useState<string[]>([])
   const [profesional, setProfesional] = useState('')
+  const [selectedUser, setSelectedUser] = useState<string | null>(null)
+  const { data: userSuggestions = [] } = useUserSearch(selectedUser ? '' : profesional)
   const [fechaDesde, setFechaDesde] = useState('')
   const [fechaHasta, setFechaHasta] = useState('')
   const [expandedPerson, setExpandedPerson] = useState<string | null>(null)
@@ -109,7 +112,7 @@ export function EquipoPage() {
   }, [filteredByDate, profesional])
 
   const hasFilters = profesional || fechaDesde || fechaHasta || selectedGds.length > 0
-  const clearAll = () => { setProfesional(''); setFechaDesde(''); setFechaHasta(''); setSelectedGds([]) }
+  const clearAll = () => { setProfesional(''); setSelectedUser(null); setFechaDesde(''); setFechaHasta(''); setSelectedGds([]) }
 
   return (
     <div className="w-full space-y-6 px-6 py-6">
@@ -118,10 +121,20 @@ export function EquipoPage() {
           <label className="text-xs font-medium text-gray-500 mb-1 block">GD</label>
           <GdMultiSelect projects={projects} selected={selectedGds} onChange={setSelectedGds} isLoading={isLoadingProjects} />
         </div>
-        <div>
+        <div className="relative">
           <label className="text-xs font-medium text-gray-500 mb-1 block">Profesional</label>
-          <input type="text" placeholder="Buscar..." value={profesional} onChange={(e) => setProfesional(e.target.value)}
-            className="h-10 w-[180px] rounded-md border border-gray-300 px-3 text-sm" />
+          <input type="text" placeholder="Buscar (min 3 letras)..." value={profesional} onChange={(e) => { setProfesional(e.target.value); setSelectedUser(null) }}
+            className="h-10 w-[220px] rounded-md border border-gray-300 px-3 text-sm" />
+          {profesional.length >= 3 && userSuggestions.length > 0 && !selectedUser && (
+            <div className="absolute top-full left-0 z-50 mt-1 w-[280px] rounded-md border border-gray-200 bg-white shadow-lg max-h-48 overflow-y-auto">
+              {userSuggestions.map((user) => (
+                <div key={user.accountId} className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                  onClick={() => { setProfesional(user.displayName); setSelectedUser(user.displayName) }}>
+                  {user.displayName}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
         <div>
           <label className="text-xs font-medium text-gray-500 mb-1 block">Desde</label>
