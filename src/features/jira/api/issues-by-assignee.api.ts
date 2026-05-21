@@ -5,14 +5,21 @@ import type { RawJiraIssue } from '../types/jira.types'
 const PAGE_SIZE = 50
 
 /**
- * Busca todas las issues donde un usuario tiene worklogs registrados
- * (Clockwork Pro, registro manual, etc.) usando JQL worklogAuthor.
- * Incluye issues donde NO es assignee pero sí registró tiempo.
+ * Busca todas las issues (incluyendo subtareas) donde un usuario
+ * tiene worklogs registrados, opcionalmente filtrado por rango de fechas.
  */
-export async function fetchIssuesByAssignee(displayName: string): Promise<RawJiraIssue[]> {
+export async function fetchIssuesByAssignee(
+  displayName: string,
+  dateFrom?: string,
+  dateTo?: string
+): Promise<RawJiraIssue[]> {
   if (!displayName) return []
 
-  const jql = `worklogAuthor = "${displayName}" ORDER BY created DESC`
+  let jql = `worklogAuthor = "${displayName}"`
+  if (dateFrom) jql += ` AND worklogDate >= "${dateFrom}"`
+  if (dateTo) jql += ` AND worklogDate <= "${dateTo}"`
+  jql += ' ORDER BY created DESC'
+
   const allIssues: RawJiraIssue[] = []
   let nextPageToken: string | null | undefined = undefined
   let isLast = false

@@ -86,7 +86,7 @@ export function EquipoPage() {
   const { data: rawIssuesByGd = [], isLoading: isLoadingByGd, dataUpdatedAt: updatedGd } = useIssues(selectedGds)
 
   // Modo 2: por profesional (accountId)
-  const { data: rawIssuesByUser = [], isLoading: isLoadingByUser, dataUpdatedAt: updatedUser } = useIssuesByAssignee(selectedName)
+  const { data: rawIssuesByUser = [], isLoading: isLoadingByUser, dataUpdatedAt: updatedUser } = useIssuesByAssignee(selectedName, fechaDesde || undefined, fechaHasta || undefined)
 
   // Combinar resultados: si hay GD usa esos, si hay usuario usa esos, si ambos combina
   const rawIssues = useMemo(() => {
