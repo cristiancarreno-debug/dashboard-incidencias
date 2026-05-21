@@ -39,7 +39,7 @@ export function PersonDetailCard({ name, issues, projectNames, expandedSection, 
   const tablerosAsignados = [...new Set(issues.map((i) => i.project))]
   const abiertas = issues.filter((i) => !TERMINAL_STATES.has(i.status))
   const cerradas = issues.filter((i) => TERMINAL_STATES.has(i.status))
-  const totalSeconds = issues.reduce((sum, i) => sum + (i.timespentSeconds || 0), 0)
+  const totalSeconds = issues.reduce((sum, issue) => sum + issue.worklogs.filter(w => w.author.toLowerCase() === name.toLowerCase()).reduce((s, w) => s + w.seconds, 0), 0)
   const horasReales = Math.round(totalSeconds / 3600 * 10) / 10
 
   const byType: Record<string, number> = {}

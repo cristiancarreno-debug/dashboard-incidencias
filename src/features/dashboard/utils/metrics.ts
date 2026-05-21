@@ -287,5 +287,6 @@ export function enrichIssue(
     epic,
     rice,
     timespentSeconds: raw.fields.timespent ?? 0,
+    worklogs: (raw.fields.worklog?.worklogs ?? []).map(w => ({ author: w.author.displayName, seconds: w.timeSpentSeconds, started: w.started })),
   }
 }

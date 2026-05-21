@@ -44,6 +44,7 @@ export interface EnrichedIssue {
   epic: string
   rice: RiceResult
   timespentSeconds: number
+  worklogs: Array<{ author: string; seconds: number; started: string }>
 }
 
 /** Estado de filtros activos. */

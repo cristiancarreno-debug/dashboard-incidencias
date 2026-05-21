@@ -19,7 +19,7 @@ export interface RawJiraIssue {
     issuetype: { name: string }
     parent?: { key: string; fields: { summary: string } } | null
     timespent: number | null
-  }
+    worklog?: { total: number; maxResults: number; worklogs: Array<{ author: { displayName: string; accountId: string }; timeSpentSeconds: number; started: string }> }  }
 }
 
 /** Transición disponible para una issue de Jira. */
