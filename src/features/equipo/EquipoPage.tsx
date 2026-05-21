@@ -120,21 +120,37 @@ export function EquipoPage() {
     })
   }, [enrichedIssues, fechaDesde, fechaHasta])
 
-  // Filtrar por nombre (solo si hay GD seleccionado y se escribió nombre)
+  // Agrupar por persona: incluye issues donde es assignee O tiene worklogs
   const personData = useMemo(() => {
-    const map = new Map<string, EnrichedIssue[]>()
+    const map = new Map<string, Set<string>>() // name -> set of issue keys
+    const issueMap = new Map<string, EnrichedIssue>() // key -> issue
+
     for (const issue of filteredByDate) {
-      const name = issue.assignee || 'Sin asignar'
-      // Si se seleccionó un usuario específico y estamos en modo GD, filtrar
-      if (selectedGds.length > 0 && selectedName) {
-        if (!name.toLowerCase().includes(selectedName.toLowerCase())) continue
+      issueMap.set(issue.key, issue)
+
+      // Agregar por assignee
+      const assigneeName = issue.assignee || 'Sin asignar'
+      if (!map.has(assigneeName)) map.set(assigneeName, new Set())
+      map.get(assigneeName)!.add(issue.key)
+
+      // Agregar por worklog author (quien realmente trabajó)
+      for (const wl of issue.worklogs) {
+        if (!map.has(wl.author)) map.set(wl.author, new Set())
+        map.get(wl.author)!.add(issue.key)
       }
-      const list = map.get(name) ?? []
-      list.push(issue)
-      map.set(name, list)
     }
-    return Array.from(map.entries()).map(([name, issues]) => ({ name, issues })).sort((a, b) => b.issues.length - a.issues.length)
-  }, [filteredByDate, selectedGds, selectedName])
+
+    // Filtrar por nombre si se seleccionó uno
+    let entries = Array.from(map.entries())
+    if (selectedName) {
+      entries = entries.filter(([name]) => name.toLowerCase().includes(selectedName.toLowerCase()))
+    }
+
+    return entries
+      .map(([name, keys]) => ({ name, issues: Array.from(keys).map(k => issueMap.get(k)!).filter(Boolean) }))
+      .filter(({ issues }) => issues.length > 0)
+      .sort((a, b) => b.issues.length - a.issues.length)
+  }, [filteredByDate, selectedName])
 
   const hasFilters = selectedGds.length > 0 || selectedAccountId || fechaDesde || fechaHasta
   const hasData = selectedGds.length > 0 || selectedAccountId
