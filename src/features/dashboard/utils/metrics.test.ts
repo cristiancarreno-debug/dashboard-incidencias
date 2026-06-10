@@ -41,6 +41,7 @@ const RICE_PRIORITIES: RicePriority[] = ['Crítica', 'Alta', 'Media', 'Baja']
 /** Columnas de ordenamiento válidas. */
 const SORT_COLUMNS: SortColumn[] = [
   'key',
+  'mdsb',
   'sprint',
   'summary',
   'equipo',
@@ -383,6 +384,10 @@ describe('Métricas y filtrado del Dashboard', () => {
               case 'sprint':
                 valA = a.sprint.toLowerCase()
                 valB = b.sprint.toLowerCase()
+                break
+              case 'mdsb':
+                valA = a.mdsbLinks.length > 0 ? Math.max(...a.mdsbLinks.map((m) => m.daysOpen)) : 0
+                valB = b.mdsbLinks.length > 0 ? Math.max(...b.mdsbLinks.map((m) => m.daysOpen)) : 0
                 break
               default:
                 return

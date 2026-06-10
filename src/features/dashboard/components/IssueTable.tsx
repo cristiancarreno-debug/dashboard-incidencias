@@ -118,6 +118,7 @@ function MdsbCell({ mdsbLinks }: { mdsbLinks: EnrichedIssue['mdsbLinks'] }) {
 /** Definición de columnas ordenables. */
 const SORTABLE_COLUMNS: { key: SortColumn; label: string }[] = [
   { key: 'key', label: 'Clave' },
+  { key: 'mdsb', label: 'MDSB' },
   { key: 'sprint', label: 'Sprint' },
   { key: 'summary', label: 'Resumen' },
   { key: 'tipo', label: 'Tipo' },
@@ -220,7 +221,6 @@ export function IssueTable({
                   </span>
                 </th>
               ))}
-              <th className="px-3 py-3">MDSB</th>
               <th className="px-3 py-3">Acciones</th>
             </tr>
           </thead>
@@ -250,6 +250,13 @@ export function IssueTable({
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 </td>
+                <td className="px-3 py-2">
+                  {issue.tipo === 'Incidente' ? (
+                    <MdsbCell mdsbLinks={issue.mdsbLinks} />
+                  ) : (
+                    <span className="text-gray-400">—</span>
+                  )}
+                </td>
                 <td className="whitespace-nowrap px-3 py-2 text-gray-600" title={issue.sprint}>
                   {issue.sprint}
                 </td>
@@ -275,13 +282,6 @@ export function IssueTable({
                 </td>
                 <td className="whitespace-nowrap px-3 py-2 text-gray-600">
                   {issue.created.slice(0, 10)}
-                </td>
-                <td className="px-3 py-2">
-                  {issue.tipo === 'Incidente' ? (
-                    <MdsbCell mdsbLinks={issue.mdsbLinks} />
-                  ) : (
-                    <span className="text-gray-400">—</span>
-                  )}
                 </td>
                 <td className="px-3 py-2">
                   <div className="relative inline-block">

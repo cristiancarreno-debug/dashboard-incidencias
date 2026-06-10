@@ -69,6 +69,7 @@ export interface SortConfig {
 /** Columnas disponibles para ordenamiento. */
 export type SortColumn =
   | 'key'
+  | 'mdsb'
   | 'sprint'
   | 'summary'
   | 'equipo'

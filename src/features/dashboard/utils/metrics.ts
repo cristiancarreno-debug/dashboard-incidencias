@@ -219,6 +219,10 @@ export function sortIssues(issues: EnrichedIssue[], sortConfig: SortConfig): Enr
         valA = a.sprint.toLowerCase()
         valB = b.sprint.toLowerCase()
         break
+      case 'mdsb':
+        valA = a.mdsbLinks.length > 0 ? Math.max(...a.mdsbLinks.map((m) => m.daysOpen)) : 0
+        valB = b.mdsbLinks.length > 0 ? Math.max(...b.mdsbLinks.map((m) => m.daysOpen)) : 0
+        break
       default:
         return 0
     }
