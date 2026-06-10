@@ -37,7 +37,6 @@ import {
 import { riceAnalyze } from '@/features/rice/rice-engine'
 
 import { GdSelector } from '../components/GdSelector'
-import { RefreshButton } from '../components/RefreshButton'
 import { MetricsRow } from '../components/MetricsRow'
 import { PersonCards } from '../components/PersonCards'
 import { FilterBar } from '../components/FilterBar'
@@ -67,7 +66,6 @@ export function DashboardPage() {
   const {
     data: rawIssues = [],
     isLoading: isLoadingIssues,
-    isFetching,
     dataUpdatedAt,
   } = useIssues(selectedGds)
 
@@ -118,10 +116,6 @@ export function DashboardPage() {
   )
 
   // --- Callbacks ---
-  const onRefresh = useCallback(() => {
-    queryClient.invalidateQueries()
-  }, [queryClient])
-
   const handleRiceClick = useCallback(
     (issue: EnrichedIssue, anchor: HTMLElement) => {
       setRicePopover({ issue, anchor })

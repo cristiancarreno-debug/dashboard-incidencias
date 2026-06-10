@@ -72,6 +72,7 @@ export function applyFilters(issues: EnrichedIssue[], filters: ActiveFilters): E
       return false
     if (filters.assignee.size > 0 && !filters.assignee.has(issue.assignee)) return false
     if (filters.epic.size > 0 && !filters.epic.has(issue.epic)) return false
+    if (filters.sprint.size > 0 && !filters.sprint.has(issue.sprint)) return false
     return true
   })
 }
@@ -214,6 +215,10 @@ export function sortIssues(issues: EnrichedIssue[], sortConfig: SortConfig): Enr
         valA = a.status.toLowerCase()
         valB = b.status.toLowerCase()
         break
+      case 'sprint':
+        valA = a.sprint.toLowerCase()
+        valB = b.sprint.toLowerCase()
+        break
       default:
         return 0
     }
@@ -266,6 +271,8 @@ export function enrichIssue(
     ? `${raw.fields.parent.key} - ${raw.fields.parent.fields.summary}`
     : 'Sin épica'
 
+  const sprint = raw.fields.sprint?.name ?? 'Sin sprint'
+
   const createdDate = new Date(raw.fields.created)
   const day = String(createdDate.getDate()).padStart(2, '0')
   const month = String(createdDate.getMonth() + 1).padStart(2, '0')
@@ -285,6 +292,7 @@ export function enrichIssue(
     project,
     equipo: project,
     epic,
+    sprint,
     rice,
     timespentSeconds: raw.fields.timespent ?? 0,
     worklogs: (raw.fields.worklog?.worklogs ?? []).map(w => ({ author: w.author.displayName, seconds: w.timeSpentSeconds, started: w.started })),

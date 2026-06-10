@@ -41,6 +41,7 @@ const RICE_PRIORITIES: RicePriority[] = ['Crítica', 'Alta', 'Media', 'Baja']
 /** Columnas de ordenamiento válidas. */
 const SORT_COLUMNS: SortColumn[] = [
   'key',
+  'sprint',
   'summary',
   'equipo',
   'tipo',
@@ -81,6 +82,7 @@ const arbitraryEnrichedIssue: fc.Arbitrary<EnrichedIssue> = fc.record({
     'GD200-15 - Performance',
     'Sin épica'
   ),
+  sprint: fc.constantFrom('Sprint 1', 'Sprint 2', 'Sprint 3', 'Sin sprint'),
   rice: fc.record({
     risk: fc.constantFrom('alto', 'medio', 'bajo', 'sin clasificar'),
     reach: fc.integer({ min: 1, max: 100 }),
@@ -90,6 +92,12 @@ const arbitraryEnrichedIssue: fc.Arbitrary<EnrichedIssue> = fc.record({
     score: fc.double({ min: 0, max: 200, noNaN: true }),
     priority: fc.constantFrom(...RICE_PRIORITIES),
   }),
+  timespentSeconds: fc.integer({ min: 0, max: 360000 }),
+  worklogs: fc.array(fc.record({
+    author: fc.constantFrom('Juan Pérez', 'María López', 'Carlos García'),
+    seconds: fc.integer({ min: 60, max: 28800 }),
+    started: fc.integer({ min: 1704067200000, max: 1798761600000 }).map((ts) => new Date(ts).toISOString()),
+  }), { minLength: 0, maxLength: 3 }),
 })
 
 
@@ -134,6 +142,7 @@ describe('Métricas y filtrado del Dashboard', () => {
           ricePriority: fc.subarray(['Crítica', 'Alta', 'Media', 'Baja'] as RicePriority[]).map((arr) => new Set(arr)),
           assignee: fc.subarray(['Juan Pérez', 'María López', 'Carlos García']).map((arr) => new Set(arr)),
           epic: fc.subarray(['GD768-10 - Migración Cloud', 'Sin épica']).map((arr) => new Set(arr)),
+          sprint: fc.subarray(['Sprint 1', 'Sprint 2', 'Sprint 3', 'Sin sprint']).map((arr) => new Set(arr)),
         }),
         (issues, filters: ActiveFilters) => {
           const result = applyFilters(issues, filters)
@@ -158,6 +167,9 @@ describe('Métricas y filtrado del Dashboard', () => {
             if (filters.epic.size > 0) {
               expect(filters.epic.has(issue.epic)).toBe(true)
             }
+            if (filters.sprint.size > 0) {
+              expect(filters.sprint.has(issue.sprint)).toBe(true)
+            }
           }
 
           // Verify completeness: no issue satisfying all criteria is excluded
@@ -168,6 +180,7 @@ describe('Métricas y filtrado del Dashboard', () => {
             if (filters.ricePriority.size > 0 && !filters.ricePriority.has(issue.rice.priority)) return false
             if (filters.assignee.size > 0 && !filters.assignee.has(issue.assignee)) return false
             if (filters.epic.size > 0 && !filters.epic.has(issue.epic)) return false
+            if (filters.sprint.size > 0 && !filters.sprint.has(issue.sprint)) return false
             return true
           })
           expect(result.length).toBe(expected.length)
@@ -361,6 +374,10 @@ describe('Métricas y filtrado del Dashboard', () => {
               case 'status':
                 valA = a.status.toLowerCase()
                 valB = b.status.toLowerCase()
+                break
+              case 'sprint':
+                valA = a.sprint.toLowerCase()
+                valB = b.sprint.toLowerCase()
                 break
               default:
                 return

@@ -14,6 +14,7 @@ export function useFilters() {
     ricePriority: new Set<string>(),
     assignee: new Set<string>(),
     epic: new Set<string>(),
+    sprint: new Set<string>(),
   })
 
   /** Restablece todos los filtros a su estado inicial (vacío). */
@@ -25,6 +26,7 @@ export function useFilters() {
       ricePriority: new Set<string>(),
       assignee: new Set<string>(),
       epic: new Set<string>(),
+      sprint: new Set<string>(),
     })
   }, [])
 

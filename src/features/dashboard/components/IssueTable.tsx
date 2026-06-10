@@ -54,6 +54,7 @@ const JIRA_BASE_URL = 'https://jirasegurosbolivar.atlassian.net/browse'
 /** Definición de columnas ordenables. */
 const SORTABLE_COLUMNS: { key: SortColumn; label: string }[] = [
   { key: 'key', label: 'Clave' },
+  { key: 'sprint', label: 'Sprint' },
   { key: 'summary', label: 'Resumen' },
   { key: 'tipo', label: 'Tipo' },
   { key: 'status', label: 'Estado' },
@@ -184,6 +185,9 @@ export function IssueTable({
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 </td>
+                <td className="whitespace-nowrap px-3 py-2 text-gray-600" title={issue.sprint}>
+                  {issue.sprint}
+                </td>
                 <td className="max-w-xs truncate px-3 py-2" title={issue.summary}>
                   {issue.summary}
                 </td>
@@ -223,7 +227,7 @@ export function IssueTable({
             ))}
             {issues.length === 0 && (
               <tr>
-                <td colSpan={10} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={11} className="px-4 py-8 text-center text-gray-500">
                   No se encontraron incidencias con los filtros actuales.
                 </td>
               </tr>

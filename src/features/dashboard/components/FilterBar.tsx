@@ -24,14 +24,16 @@ export function FilterBar({ issues, filters, onFiltersChange, searchQuery, onSea
   const ricePriorityOptions = useMemo(() => computeOptions(issues.map((i) => i.rice.priority)), [issues])
   const assigneeOptions = useMemo(() => computeOptions(issues.map((i) => i.assignee)), [issues])
   const epicOptions = useMemo(() => computeOptions(issues.map((i) => i.epic)), [issues])
+  const sprintOptions = useMemo(() => computeOptions(issues.map((i) => i.sprint)), [issues])
 
   const handleFilterChange = (key: keyof ActiveFilters, selected: Set<string>) => {
     onFiltersChange({ ...filters, [key]: selected })
   }
 
   return (
-    <div className="grid grid-cols-7 gap-2 flex-1">
+    <div className="grid grid-cols-8 gap-2 flex-1">
       <MultiCheckboxDropdown label="Equipo" options={equipoOptions} selected={filters.equipo} onSelectionChange={(s) => handleFilterChange('equipo', s)} />
+      <MultiCheckboxDropdown label="Sprint" options={sprintOptions} selected={filters.sprint} onSelectionChange={(s) => handleFilterChange('sprint', s)} />
       <MultiCheckboxDropdown label="Tipo" options={tipoOptions} selected={filters.tipo} onSelectionChange={(s) => handleFilterChange('tipo', s)} />
       <MultiCheckboxDropdown label="Estado" options={statusOptions} selected={filters.status} onSelectionChange={(s) => handleFilterChange('status', s)} />
       <MultiCheckboxDropdown label="Prioridad RICE" options={ricePriorityOptions} selected={filters.ricePriority} onSelectionChange={(s) => handleFilterChange('ricePriority', s)} />

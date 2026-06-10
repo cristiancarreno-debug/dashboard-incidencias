@@ -42,6 +42,7 @@ export interface EnrichedIssue {
   project: string
   equipo: string
   epic: string
+  sprint: string
   rice: RiceResult
   timespentSeconds: number
   worklogs: Array<{ author: string; seconds: number; started: string }>
@@ -55,6 +56,7 @@ export interface ActiveFilters {
   ricePriority: Set<string>
   assignee: Set<string>
   epic: Set<string>
+  sprint: Set<string>
 }
 
 /** Configuración de ordenamiento de tabla. */
@@ -66,6 +68,7 @@ export interface SortConfig {
 /** Columnas disponibles para ordenamiento. */
 export type SortColumn =
   | 'key'
+  | 'sprint'
   | 'summary'
   | 'equipo'
   | 'tipo'
