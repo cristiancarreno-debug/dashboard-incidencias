@@ -4,7 +4,10 @@ import {
   ArrowDown,
   MoreHorizontal,
   ExternalLink,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react'
+import { useState } from 'react'
 import type { EnrichedIssue, SortConfig, SortColumn } from '@/features/rice/rice.types'
 
 /** Props del componente IssueTable. */
@@ -50,6 +53,67 @@ const RICE_PRIORITY_COLORS: Record<string, string> = {
 
 /** URL base de Jira para enlaces a issues. */
 const JIRA_BASE_URL = 'https://jirasegurosbolivar.atlassian.net/browse'
+
+/** Color del badge MDSB según días abierto. */
+function getMdsbColor(daysOpen: number): string {
+  if (daysOpen <= 1) return 'bg-green-100 text-green-800'
+  if (daysOpen <= 3) return 'bg-yellow-100 text-yellow-800'
+  if (daysOpen <= 7) return 'bg-orange-100 text-orange-800'
+  return 'bg-red-100 text-red-800'
+}
+
+/** Límite de MDSB visibles antes de colapsar. */
+const MDSB_VISIBLE_LIMIT = 2
+
+/** Celda que renderiza los badges MDSB con colapso. */
+function MdsbCell({ mdsbLinks }: { mdsbLinks: EnrichedIssue['mdsbLinks'] }) {
+  const [expanded, setExpanded] = useState(false)
+
+  if (mdsbLinks.length === 0) {
+    return <span className="text-gray-400">—</span>
+  }
+
+  const visibleLinks = expanded ? mdsbLinks : mdsbLinks.slice(0, MDSB_VISIBLE_LIMIT)
+  const hiddenCount = mdsbLinks.length - MDSB_VISIBLE_LIMIT
+
+  return (
+    <div className="flex flex-col gap-1">
+      {visibleLinks.map((mdsb) => (
+        <a
+          key={mdsb.key}
+          href={`${JIRA_BASE_URL}/${mdsb.key}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${getMdsbColor(mdsb.daysOpen)} hover:opacity-80`}
+          title={`${mdsb.key} — ${mdsb.status} — ${mdsb.daysOpen}d abierto`}
+        >
+          {mdsb.key.replace('MDSB-', '')}
+          <span className="font-bold">·</span>
+          {mdsb.daysOpen}d
+          <ExternalLink className="h-2.5 w-2.5" />
+        </a>
+      ))}
+      {hiddenCount > 0 && !expanded && (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="inline-flex items-center gap-0.5 text-xs text-indigo-600 hover:text-indigo-800"
+        >
+          +{hiddenCount} más <ChevronDown className="h-3 w-3" />
+        </button>
+      )}
+      {expanded && hiddenCount > 0 && (
+        <button
+          type="button"
+          onClick={() => setExpanded(false)}
+          className="inline-flex items-center gap-0.5 text-xs text-indigo-600 hover:text-indigo-800"
+        >
+          Colapsar <ChevronUp className="h-3 w-3" />
+        </button>
+      )}
+    </div>
+  )
+}
 
 /** Definición de columnas ordenables. */
 const SORTABLE_COLUMNS: { key: SortColumn; label: string }[] = [
@@ -156,6 +220,7 @@ export function IssueTable({
                   </span>
                 </th>
               ))}
+              <th className="px-3 py-3">MDSB</th>
               <th className="px-3 py-3">Acciones</th>
             </tr>
           </thead>
@@ -212,6 +277,13 @@ export function IssueTable({
                   {issue.created.slice(0, 10)}
                 </td>
                 <td className="px-3 py-2">
+                  {issue.tipo === 'Incidente' ? (
+                    <MdsbCell mdsbLinks={issue.mdsbLinks} />
+                  ) : (
+                    <span className="text-gray-400">—</span>
+                  )}
+                </td>
+                <td className="px-3 py-2">
                   <div className="relative inline-block">
                     <button
                       type="button"
@@ -227,7 +299,7 @@ export function IssueTable({
             ))}
             {issues.length === 0 && (
               <tr>
-                <td colSpan={11} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={12} className="px-4 py-8 text-center text-gray-500">
                   No se encontraron incidencias con los filtros actuales.
                 </td>
               </tr>

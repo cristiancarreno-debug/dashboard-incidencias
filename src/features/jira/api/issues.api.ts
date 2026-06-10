@@ -29,7 +29,7 @@ export async function fetchIssuesByGds(gdKeys: string[]): Promise<RawJiraIssue[]
     const params: Record<string, string | number> = {
       jql,
       maxResults: PAGE_SIZE,
-      fields: 'summary,assignee,status,created,issuetype,parent,timespent,worklog,customfield_10101',
+      fields: 'summary,assignee,status,created,issuetype,parent,timespent,worklog,customfield_10101,issuelinks',
     }
 
     if (nextPageToken) {

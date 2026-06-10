@@ -21,6 +21,10 @@ export interface RawJiraIssue {
     timespent: number | null
     worklog?: { total: number; maxResults: number; worklogs: Array<{ author: { displayName: string; accountId: string }; timeSpentSeconds: number; started: string }> }
     customfield_10101?: Array<{ name: string; state: string }> | null
+    issuelinks?: Array<{
+      outwardIssue?: { key: string; fields: { summary: string; status: { name: string }; created?: string } }
+      inwardIssue?: { key: string; fields: { summary: string; status: { name: string }; created?: string } }
+    }> | null
   }
 }
 

@@ -245,6 +245,40 @@ export function partitionIssues(issues: EnrichedIssue[]): DatasetPartition {
 }
 
 /**
+ * Extrae los links MDSB vinculados a una issue.
+ * Calcula días abiertos desde la fecha de creación de la propia issue
+ * (como proxy, ya que la API de búsqueda no incluye created del linked issue).
+ *
+ * @param raw - Issue cruda de Jira.
+ * @returns Array de MDSB con clave, estado y días abierto.
+ */
+function extractMdsbLinks(raw: RawJiraIssue): Array<{ key: string; status: string; daysOpen: number }> {
+  const links = raw.fields.issuelinks
+  if (!links || links.length === 0) return []
+
+  const now = Date.now()
+  const issueCreated = new Date(raw.fields.created).getTime()
+  const msPerDay = 86_400_000
+
+  const mdsbItems: Array<{ key: string; status: string; daysOpen: number }> = []
+
+  for (const link of links) {
+    const linked = link.outwardIssue ?? link.inwardIssue
+    if (!linked) continue
+    if (!linked.key.startsWith('MDSB-')) continue
+
+    const daysOpen = Math.max(1, Math.ceil((now - issueCreated) / msPerDay))
+    mdsbItems.push({
+      key: linked.key,
+      status: linked.fields.status.name,
+      daysOpen,
+    })
+  }
+
+  return mdsbItems
+}
+
+/**
  * Transforma una RawJiraIssue en EnrichedIssue con RICE calculado.
  * Formatea la fecha de creación como dd/MM/yyyy.
  *
@@ -301,5 +335,6 @@ export function enrichIssue(
     rice,
     timespentSeconds: raw.fields.timespent ?? 0,
     worklogs: (raw.fields.worklog?.worklogs ?? []).map(w => ({ author: w.author.displayName, seconds: w.timeSpentSeconds, started: w.started })),
+    mdsbLinks: extractMdsbLinks(raw),
   }
 }

@@ -98,6 +98,11 @@ const arbitraryEnrichedIssue: fc.Arbitrary<EnrichedIssue> = fc.record({
     seconds: fc.integer({ min: 60, max: 28800 }),
     started: fc.integer({ min: 1704067200000, max: 1798761600000 }).map((ts) => new Date(ts).toISOString()),
   }), { minLength: 0, maxLength: 3 }),
+  mdsbLinks: fc.array(fc.record({
+    key: fc.integer({ min: 1000000, max: 9999999 }).map((n) => `MDSB-${n}`),
+    status: fc.constantFrom('Abierto', 'En Progreso', 'Resuelto'),
+    daysOpen: fc.integer({ min: 1, max: 30 }),
+  }), { minLength: 0, maxLength: 3 }),
 })
 
 

@@ -46,6 +46,7 @@ export interface EnrichedIssue {
   rice: RiceResult
   timespentSeconds: number
   worklogs: Array<{ author: string; seconds: number; started: string }>
+  mdsbLinks: Array<{ key: string; status: string; daysOpen: number }>
 }
 
 /** Estado de filtros activos. */
