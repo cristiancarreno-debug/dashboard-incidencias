@@ -271,7 +271,12 @@ export function enrichIssue(
     ? `${raw.fields.parent.key} - ${raw.fields.parent.fields.summary}`
     : 'Sin épica'
 
-  const sprint = raw.fields.sprint?.name ?? 'Sin sprint'
+  const sprint = (() => {
+    const sprints = raw.fields.customfield_10101
+    if (!sprints || sprints.length === 0) return 'Sin sprint'
+    const active = sprints.find((s) => s.state === 'active')
+    return active?.name ?? sprints[sprints.length - 1].name
+  })()
 
   const createdDate = new Date(raw.fields.created)
   const day = String(createdDate.getDate()).padStart(2, '0')

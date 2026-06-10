@@ -20,7 +20,7 @@ export interface RawJiraIssue {
     parent?: { key: string; fields: { summary: string } } | null
     timespent: number | null
     worklog?: { total: number; maxResults: number; worklogs: Array<{ author: { displayName: string; accountId: string }; timeSpentSeconds: number; started: string }> }
-    sprint?: { name: string } | null
+    customfield_10101?: Array<{ name: string; state: string }> | null
   }
 }
 

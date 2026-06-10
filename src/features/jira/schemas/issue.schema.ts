@@ -29,7 +29,7 @@ export const JiraIssueSchema = z.object({
       .optional(),
     timespent: z.number().nullable().optional(),
     worklog: z.object({ total: z.number(), maxResults: z.number(), worklogs: z.array(z.object({ author: z.object({ displayName: z.string(), accountId: z.string() }), timeSpentSeconds: z.number(), started: z.string() })) }).optional(),
-    sprint: z.object({ name: z.string() }).nullable().optional(),
+    customfield_10101: z.array(z.object({ name: z.string(), state: z.string() }).passthrough()).nullable().optional(),
   }),
 })
 
