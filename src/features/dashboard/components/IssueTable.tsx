@@ -6,9 +6,11 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronUp,
+  Download,
 } from 'lucide-react'
 import { useState } from 'react'
 import type { EnrichedIssue, SortConfig, SortColumn } from '@/features/rice/rice.types'
+import { downloadCsv } from '../utils/exportCsv'
 
 /** Props del componente IssueTable. */
 export interface IssueTableProps {
@@ -194,6 +196,15 @@ export function IssueTable({
           Mostrando <span className="font-semibold">{issues.length}</span> de{' '}
           <span className="font-semibold">{totalCount}</span> incidencias
         </span>
+        <button
+          type="button"
+          onClick={() => downloadCsv(issues)}
+          className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
+          title="Descargar tabla como CSV (links funcionales en Excel/Sheets)"
+        >
+          <Download className="h-4 w-4" />
+          Descargar CSV
+        </button>
       </div>
 
       <div className="overflow-x-auto w-full">
