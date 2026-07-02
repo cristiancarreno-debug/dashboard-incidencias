@@ -198,7 +198,7 @@ export function IssueTable({
         </span>
         <button
           type="button"
-          onClick={() => downloadCsv(issues)}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); downloadCsv(issues); }}
           className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
           title="Descargar tabla como CSV (links funcionales en Excel/Sheets)"
         >

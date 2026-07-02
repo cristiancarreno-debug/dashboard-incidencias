@@ -20,11 +20,12 @@ const JIRA_BASE_URL = 'https://jirasegurosbolivar.atlassian.net/browse'
  * @param value - Valor a escapar.
  * @returns Valor seguro para CSV.
  */
-function escapeCsvValue(value: string): string {
-  if (value.includes(',') || value.includes('"') || value.includes('\n') || value.includes('=')) {
-    return `"${value.replace(/"/g, '""')}"`
+function escapeCsvValue(value: string | null | undefined): string {
+  const str = value ?? ''
+  if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('=')) {
+    return `"${str.replace(/"/g, '""')}"`
   }
-  return value
+  return str
 }
 
 /**
@@ -102,16 +103,25 @@ export function generateCsvContent(issues: EnrichedIssue[]): string {
  * @param filename - Nombre del archivo (sin extensión).
  */
 export function downloadCsv(issues: EnrichedIssue[], filename: string = 'incidencias'): void {
-  const csvContent = generateCsvContent(issues)
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
+  if (!issues || issues.length === 0) return
 
-  const link = document.createElement('a')
-  link.setAttribute('href', url)
-  link.setAttribute('download', `${filename}-${new Date().toISOString().slice(0, 10)}.csv`)
-  link.style.display = 'none'
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
+  try {
+    const csvContent = generateCsvContent(issues)
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${filename}-${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(link)
+    link.click()
+
+    // Cleanup after a small delay to ensure download starts
+    setTimeout(() => {
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }, 100)
+  } catch (error) {
+    console.error('[exportCsv] Error al generar CSV:', error)
+  }
 }
