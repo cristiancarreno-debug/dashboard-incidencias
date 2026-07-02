@@ -98,8 +98,7 @@ export function generateCsvContent(issues: EnrichedIssue[]): string {
 
 /**
  * Descarga un archivo CSV con las issues proporcionadas.
- * Usa window.open con data URI octet-stream para forzar descarga
- * incluso en iframes sandboxed (portales corporativos con GitHub Pages).
+ * Usa window.top para escapar del sandbox del iframe corporativo.
  *
  * @param issues - Issues a exportar.
  * @param filename - Nombre del archivo (sin extensión).
@@ -109,9 +108,39 @@ export function downloadCsv(issues: EnrichedIssue[], filename: string = 'inciden
 
   try {
     const csvContent = generateCsvContent(issues)
-    const dataUri = 'data:application/octet-stream;charset=utf-8,' + encodeURIComponent(csvContent)
-    window.open(dataUri, '_blank')
-  } catch (error) {
-    console.error('[exportCsv] Error al generar CSV:', error)
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const fullFilename = `${filename}-${new Date().toISOString().slice(0, 10)}.csv`
+
+    // Intentar con window.top (escapa del iframe sandbox)
+    const topWindow = window.top || window.parent || window
+    const link = topWindow.document.createElement('a')
+    link.href = url
+    link.download = fullFilename
+    link.style.display = 'none'
+    topWindow.document.body.appendChild(link)
+    link.click()
+    setTimeout(() => {
+      topWindow.document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }, 200)
+  } catch {
+    // Si window.top falla por CORS, fallback con window actual
+    try {
+      const csvContent = generateCsvContent(issues)
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${filename}-${new Date().toISOString().slice(0, 10)}.csv`
+      document.body.appendChild(link)
+      link.click()
+      setTimeout(() => {
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+      }, 200)
+    } catch (error) {
+      console.error('[exportCsv] Error al generar CSV:', error)
+    }
   }
 }
