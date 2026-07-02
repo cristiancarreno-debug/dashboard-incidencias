@@ -29,37 +29,34 @@ function escapeCsvValue(value: string | null | undefined): string {
 }
 
 /**
- * Genera un hipervínculo en formato Excel/Sheets.
+ * Genera un hipervínculo en formato Google Sheets (locale español: separador ;).
  *
  * @param url - URL destino del enlace.
  * @param label - Texto visible del enlace.
- * @returns Fórmula HYPERLINK para CSV.
+ * @returns Fórmula HYPERLINK para CSV con separador punto y coma.
  */
 function buildHyperlink(url: string, label: string): string {
-  return `"=HYPERLINK(""${url}"",""${label}"")"`
+  return `"=HYPERLINK(""${url}"";""${label}"")"`
 }
 
 /**
- * Construye los enlaces MDSB como fórmulas HYPERLINK separadas por " | ".
+ * Construye los enlaces MDSB como fórmulas HYPERLINK.
  *
  * @param mdsbLinks - Array de links MDSB de la issue.
- * @returns Celda CSV con los hipervínculos MDSB concatenados, o "—" si no hay.
+ * @returns Celda CSV con los hipervínculos MDSB, o "—" si no hay.
  */
 function buildMdsbCell(mdsbLinks: EnrichedIssue['mdsbLinks']): string {
   if (mdsbLinks.length === 0) return '—'
 
-  const links = mdsbLinks.map(
-    (mdsb) => `=HYPERLINK("${JIRA_BASE_URL}/${mdsb.key}","${mdsb.key} - ${mdsb.daysOpen}d")`
-  )
-
-  if (links.length === 1) {
-    return `"${links[0].replace(/"/g, '""')}"`
+  if (mdsbLinks.length === 1) {
+    const mdsb = mdsbLinks[0]
+    return `"=HYPERLINK(""${JIRA_BASE_URL}/${mdsb.key}"";""${mdsb.key} - ${mdsb.daysOpen}d"")"`
   }
 
-  // Múltiples MDSB: listar keys con días, enlazados individualmente
-  const labels = mdsbLinks.map((m) => `${m.key} (${m.daysOpen}d)`)
-  const firstUrl = `${JIRA_BASE_URL}/${mdsbLinks[0].key}`
-  return buildHyperlink(firstUrl, labels.join(' | '))
+  // Múltiples MDSB: mostrar el primero como link y los demás como texto
+  const mdsb = mdsbLinks[0]
+  const others = mdsbLinks.slice(1).map((m) => `${m.key}(${m.daysOpen}d)`).join(' ')
+  return `"=HYPERLINK(""${JIRA_BASE_URL}/${mdsb.key}"";""${mdsb.key} - ${mdsb.daysOpen}d | ${others}"")"`
 }
 
 /**
@@ -77,7 +74,7 @@ export function generateCsvContent(issues: EnrichedIssue[]): string {
   const headerRow = headers.join(',')
 
   const rows = issues.map((issue) => {
-    const claveCell = buildHyperlink(`${JIRA_BASE_URL}/${issue.key}`, issue.key)
+    const claveCell = `"=HYPERLINK(""${JIRA_BASE_URL}/${issue.key}"";""${issue.key}"")"`
     const mdsbCell = buildMdsbCell(issue.mdsbLinks)
     const sprintCell = escapeCsvValue(issue.sprint || 'Sin sprint')
     const resumenCell = escapeCsvValue(issue.summary)
