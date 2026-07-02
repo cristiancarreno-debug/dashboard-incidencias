@@ -98,7 +98,8 @@ export function generateCsvContent(issues: EnrichedIssue[]): string {
 
 /**
  * Descarga un archivo CSV con las issues proporcionadas.
- * Usa window.open como fallback para entornos con sandbox (GitHub Pages).
+ * Abre una nueva ventana con el contenido CSV para evitar restricciones
+ * de sandbox en iframes (GitHub Pages dentro de portales corporativos).
  *
  * @param issues - Issues a exportar.
  * @param filename - Nombre del archivo (sin extensión).
@@ -109,19 +110,31 @@ export function downloadCsv(issues: EnrichedIssue[], filename: string = 'inciden
   try {
     const csvContent = generateCsvContent(issues)
 
-    // Usar data URI con window.open para evitar restricción de sandbox en GitHub Pages
-    const encodedUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent)
-    const link = document.createElement('a')
-    link.setAttribute('href', encodedUri)
-    link.setAttribute('download', `${filename}-${new Date().toISOString().slice(0, 10)}.csv`)
-    link.setAttribute('target', '_top')
-    link.style.display = 'none'
-    document.body.appendChild(link)
-    link.click()
+    // Abrir nueva ventana con el CSV como texto plano
+    // El usuario puede guardar con Ctrl+S / Cmd+S
+    const win = window.open('', '_blank')
+    if (win) {
+      win.document.open()
+      win.document.write('<html><head><title>' + filename + '.csv</title></head><body><pre>' + csvContent.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre></body></html>')
+      win.document.close()
 
-    setTimeout(() => {
-      document.body.removeChild(link)
-    }, 100)
+      // Intentar descarga automática desde la nueva ventana (no sandboxed)
+      try {
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+        const url = URL.createObjectURL(blob)
+        const a = win.document.createElement('a')
+        a.href = url
+        a.download = `${filename}-${new Date().toISOString().slice(0, 10)}.csv`
+        win.document.body.appendChild(a)
+        a.click()
+        setTimeout(() => {
+          URL.revokeObjectURL(url)
+          win.close()
+        }, 1000)
+      } catch {
+        // Si falla, la ventana queda abierta con el CSV visible para copiar/guardar
+      }
+    }
   } catch (error) {
     console.error('[exportCsv] Error al generar CSV:', error)
   }
