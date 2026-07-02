@@ -98,6 +98,7 @@ export function generateCsvContent(issues: EnrichedIssue[]): string {
 
 /**
  * Descarga un archivo CSV con las issues proporcionadas.
+ * Usa window.open como fallback para entornos con sandbox (GitHub Pages).
  *
  * @param issues - Issues a exportar.
  * @param filename - Nombre del archivo (sin extensión).
@@ -107,19 +108,19 @@ export function downloadCsv(issues: EnrichedIssue[], filename: string = 'inciden
 
   try {
     const csvContent = generateCsvContent(issues)
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
 
+    // Usar data URI con window.open para evitar restricción de sandbox en GitHub Pages
+    const encodedUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent)
     const link = document.createElement('a')
-    link.href = url
-    link.download = `${filename}-${new Date().toISOString().slice(0, 10)}.csv`
+    link.setAttribute('href', encodedUri)
+    link.setAttribute('download', `${filename}-${new Date().toISOString().slice(0, 10)}.csv`)
+    link.setAttribute('target', '_top')
+    link.style.display = 'none'
     document.body.appendChild(link)
     link.click()
 
-    // Cleanup after a small delay to ensure download starts
     setTimeout(() => {
       document.body.removeChild(link)
-      URL.revokeObjectURL(url)
     }, 100)
   } catch (error) {
     console.error('[exportCsv] Error al generar CSV:', error)
